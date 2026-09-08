@@ -1,0 +1,461 @@
+/**
+ * استایل سراسری و دیزاین‌سیستم پروژه
+ * ===========================================================================
+ * این فایل «منبع حقیقت» تمام رنگ‌ها، فاصله‌ها، فونت‌ها و انیمیشن‌هاست.
+ *
+ * ⚠️ قانون طلایی پروژه:
+ *    هرگز در کامپوننت‌ها رنگ خام ننویس (مثل text-red-500).
+ *    همیشه از توکن استفاده کن (مثل text-destructive).
+ *    دلیل: با تغییر تم یا برند، فقط همین فایل عوض می‌شود نه ۲۰۰ کامپوننت.
+ *
+ * چرا OKLCH به‌جای HEX؟
+ *    در OKLCH مؤلفه‌ی روشنایی (L) با درک چشم انسان هم‌خوان است، پس
+ *    ساخت نسخه‌ی دارک با روشنایی یکنواخت بسیار ساده‌تر و دقیق‌تر است.
+ */
+
+@import 'tailwindcss';
+
+/* ===========================================================================
+   ۱. تعریف فونت‌های محلی
+   فونت‌ها به‌صورت محلی سرو می‌شوند (نه از CDN گوگل) تا:
+     - سرعت بارگذاری بالاتر برود
+     - وابستگی به سرویس خارجی و مشکل دسترسی نداشته باشیم
+   =========================================================================== */
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  /* swap: متن بلافاصله با فونت جایگزین نمایش داده می‌شود (جلوگیری از متن نامرئی) */
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===========================================================================
+   ۲. توکن‌های تم روشن (Light Theme)
+   این مقادیر حالت پیش‌فرض‌اند و در حالت دارک بازنویسی می‌شوند.
+   =========================================================================== */
+
+:root {
+  /* --- رنگ‌های پایه --- */
+  --background: oklch(1 0 0); /* پس‌زمینه صفحه */
+  --foreground: oklch(0.2 0.01 260); /* متن اصلی */
+
+  --card: oklch(1 0 0); /* پس‌زمینه کارت */
+  --card-foreground: oklch(0.2 0.01 260);
+
+  --popover: oklch(1 0 0); /* پس‌زمینه منوی شناور */
+  --popover-foreground: oklch(0.2 0.01 260);
+
+  /* --- رنگ برند --- */
+  --primary: oklch(0.55 0.2 265); /* دکمه اصلی، لینک، تأکید */
+  --primary-foreground: oklch(0.99 0 0); /* متن روی رنگ برند */
+
+  --secondary: oklch(0.96 0.01 260); /* دکمه ثانویه */
+  --secondary-foreground: oklch(0.25 0.01 260);
+
+  --accent: oklch(0.95 0.03 265); /* هاور و هایلایت */
+  --accent-foreground: oklch(0.25 0.02 265);
+
+  --muted: oklch(0.97 0.005 260); /* پس‌زمینه خنثی */
+  --muted-foreground: oklch(0.55 0.02 260); /* متن کم‌اهمیت */
+
+  /* --- رنگ‌های معنایی فروشگاه --- */
+  --success: oklch(0.6 0.15 155); /* موجود، پرداخت موفق، تحویل‌شده */
+  --success-foreground: oklch(0.99 0 0);
+
+  --warning: oklch(0.75 0.15 75); /* موجودی کم، در انتظار پرداخت */
+  --warning-foreground: oklch(0.2 0.02 75);
+
+  --destructive: oklch(0.58 0.22 27); /* ناموجود، لغو، حذف */
+  --destructive-foreground: oklch(0.99 0 0);
+
+  --info: oklch(0.6 0.15 240); /* در حال ارسال، اطلاع‌رسانی */
+  --info-foreground: oklch(0.99 0 0);
+
+  --sale: oklch(0.6 0.21 25); /* برچسب تخفیف */
+  --sale-foreground: oklch(0.99 0 0);
+
+  --rating: oklch(0.8 0.16 85); /* ستاره امتیاز */
+
+  /* --- خطوط و فوکوس --- */
+  --border: oklch(0.92 0.005 260); /* خط جداکننده */
+  --input: oklch(0.9 0.005 260); /* حاشیه ورودی */
+  --ring: oklch(0.55 0.2 265); /* حلقه فوکوس کیبورد */
+
+  /* --- گردی گوشه --- */
+  --radius-sm: 0.375rem; /* ۶px  — برچسب و بج */
+  --radius-md: 0.625rem; /* ۱۰px — دکمه و ورودی */
+  --radius-lg: 0.875rem; /* ۱۴px — کارت و مودال */
+  --radius-xl: 1.25rem; /* ۲۰px — بنر و هیرو */
+
+  /* --- سایه (فقط در تم روشن معنا دارد) --- */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.12);
+
+  /* --- زمان‌بندی انیمیشن --- */
+  --duration-fast: 150ms; /* هاور و فوکوس */
+  --duration-base: 250ms; /* دراپ‌داون */
+  --duration-slow: 400ms; /* کشو و مودال */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ===========================================================================
+   ۳. توکن‌های تم تاریک (Dark Theme)
+   next-themes روی <html> کلاس .dark می‌گذارد و این بلوک فعال می‌شود.
+   فقط رنگ‌ها بازنویسی می‌شوند — فاصله و گردی و فونت ثابت می‌مانند.
+   =========================================================================== */
+
+.dark {
+  --background: oklch(0.16 0.01 260);
+  --foreground: oklch(0.96 0 0);
+
+  --card: oklch(0.21 0.01 260);
+  --card-foreground: oklch(0.96 0 0);
+
+  --popover: oklch(0.21 0.01 260);
+  --popover-foreground: oklch(0.96 0 0);
+
+  /* در تم تاریک رنگ برند را کمی روشن‌تر می‌کنیم تا کنتراست کافی داشته باشد */
+  --primary: oklch(0.65 0.19 265);
+  --primary-foreground: oklch(0.15 0 0);
+
+  --secondary: oklch(0.28 0.01 260);
+  --secondary-foreground: oklch(0.96 0 0);
+
+  --accent: oklch(0.3 0.03 265);
+  --accent-foreground: oklch(0.96 0 0);
+
+  --muted: oklch(0.26 0.01 260);
+  --muted-foreground: oklch(0.68 0.02 260);
+
+  --success: oklch(0.68 0.15 155);
+  --success-foreground: oklch(0.15 0 0);
+
+  --warning: oklch(0.8 0.15 75);
+  --warning-foreground: oklch(0.15 0 0);
+
+  --destructive: oklch(0.65 0.2 27);
+  --destructive-foreground: oklch(0.15 0 0);
+
+  --info: oklch(0.68 0.14 240);
+  --info-foreground: oklch(0.15 0 0);
+
+  --sale: oklch(0.68 0.19 25);
+  --sale-foreground: oklch(0.15 0 0);
+
+  --rating: oklch(0.83 0.16 85);
+
+  --border: oklch(0.3 0.01 260);
+  --input: oklch(0.32 0.01 260);
+  --ring: oklch(0.65 0.19 265);
+
+  /*
+   * در تم تاریک سایه عملاً دیده نمی‌شود.
+   * به‌جای آن از حاشیه‌ی روشن‌تر برای جدا کردن سطوح استفاده می‌کنیم.
+   */
+  --shadow-sm: 0 0 0 1px oklch(0.3 0.01 260);
+  --shadow-md: 0 0 0 1px oklch(0.32 0.01 260);
+  --shadow-lg: 0 0 0 1px oklch(0.35 0.01 260);
+}
+
+/* ===========================================================================
+   ۴. اتصال توکن‌ها به Tailwind
+   با این بلوک کلاس‌هایی مثل bg-primary و text-muted-foreground ساخته می‌شوند.
+   =========================================================================== */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-sale: var(--sale);
+  --color-sale-foreground: var(--sale-foreground);
+  --color-rating: var(--rating);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  /* فونت‌ها — متغیرها در layout.tsx مقداردهی می‌شوند */
+  --font-sans: var(--font-app), 'Vazirmatn', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'JetBrains Mono', monospace;
+
+  /* عرض حداکثر محتوا */
+  --container-content: 80rem; /* ۱۲۸۰px */
+  --container-admin: 96rem; /* ۱۵۳۶px */
+}
+
+/* ===========================================================================
+   ۵. استایل‌های پایه
+   =========================================================================== */
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    /* اسکرول نرم هنگام کلیک روی لینک‌های داخلی */
+    scroll-behavior: smooth;
+    /* فضای بالا هنگام پرش به بخش‌ها تا زیر هدر چسبان نرود */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    /* نرم‌تر شدن رندر فونت */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /*
+   * تنظیمات ویژه‌ی خط فارسی.
+   * فارسی به فضای عمودی بیشتری نیاز دارد و letter-spacing منفی
+   * باعث چسبیدن و ناخوانا شدن حروف می‌شود.
+   */
+  html[lang='fa'] body {
+    line-height: 1.8;
+    letter-spacing: 0;
+    font-feature-settings: 'ss01', 'ss02';
+  }
+
+  html[lang='en'] body {
+    line-height: 1.5;
+  }
+
+  /*
+   * اعداد در جدول‌ها و قیمت‌ها باید هم‌عرض باشند تا ستون‌ها هم‌تراز شوند.
+   */
+  .tabular-nums,
+  table,
+  [data-price] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * حلقه فوکوس یکسان برای همه‌ی عناصر تعاملی.
+   * focus-visible یعنی فقط هنگام ناوبری با کیبورد نمایش داده شود،
+   * نه هنگام کلیک با ماوس — تجربه‌ی بهتر بدون قربانی کردن دسترسی‌پذیری.
+   */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* اسکرول‌بار هماهنگ با تم */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--muted);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+
+  /* انتخاب متن با رنگ برند */
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+/* ===========================================================================
+   ۶. ابزارهای کمکی
+   =========================================================================== */
+
+@layer utilities {
+  /**
+   * آینه کردن آیکون‌های جهت‌دار در حالت راست‌به‌چپ.
+   * مثال: <ChevronLeft className="rtl-flip" />
+   * در فارسی خودکار برعکس می‌شود.
+   */
+  [dir='rtl'] .rtl-flip {
+    transform: scaleX(-1);
+  }
+
+  /** پنهان کردن بصری اما قابل خواندن برای صفحه‌خوان (برای برچسب‌های دسترسی‌پذیری) */
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /** محدود کردن متن به چند خط با سه‌نقطه */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* ===========================================================================
+   ۷. احترام به تنظیمات دسترسی‌پذیری کاربر
+   کاربرانی که حساسیت حرکتی دارند، در تنظیمات سیستم «کاهش حرکت» را فعال
+   می‌کنند. رعایت این مورد الزامی است.
+   =========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===========================================================================
+   ۸. تایپوگرافی متن مقاله
+   ---------------------------------------------------------------------------
+   بدنه‌ی مقاله از پنل مدیریت به‌صورت HTML خام می‌آید و با
+   dangerouslySetInnerHTML رندر می‌شود. یعنی نمی‌توان روی تگ‌های داخلش
+   کلاس Tailwind گذاشت — باید از بیرون استایل بگیرند.
+
+   ⚠️ چرا اینجا و نه با variantهای دلخواه مثل [&_h2]:text-xl در JSX؟
+
+      اول همان راه امتحان شد و کار نکرد: پانزده کلاس در یک رشته‌ی
+      *چندخطی* داخل className نوشته شده بود و اسکنر Tailwind هیچ‌کدام
+      را ندید — حتی کلاس ساده‌ی leading-9 در همان رشته تولید نشد، در
+      حالی که leading-10 از یک className تک‌خطی در همان فایل درست
+      ساخته شده بود. نتیجه: تیترها هم‌اندازه‌ی متن، نقل‌قول بدون قاب و
+      فهرست بدون گلوله — بدون هیچ خطایی.
+
+      مستقل از آن باگ، جای درستِ استایل چند تگ تودرتو همین‌جاست:
+      خواناتر است، تکرار [&_x] ندارد، و افزودن تگ تازه یک خط است.
+
+   نکته‌ی RTL: از border-inline-start و padding-inline-start استفاده شده
+   تا قاب نقل‌قول و تورفتگی فهرست در هر دو جهت سمت درست بنشیند.
+   =========================================================================== */
+
+.article-body {
+  font-size: 1rem;
+  line-height: 2.25;
+  color: var(--color-foreground);
+}
+
+.article-body p {
+  margin-block-end: 1rem;
+  color: var(--color-muted-foreground);
+}
+
+.article-body h2 {
+  margin-block: 2rem 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 2;
+  color: var(--color-foreground);
+}
+
+.article-body h3 {
+  margin-block: 1.5rem 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+}
+
+.article-body ul,
+.article-body ol {
+  margin-block-end: 1.25rem;
+  padding-inline-start: 1.5rem;
+  color: var(--color-muted-foreground);
+}
+
+.article-body ul {
+  list-style-type: disc;
+}
+
+.article-body ol {
+  list-style-type: decimal;
+}
+
+.article-body li {
+  margin-block-end: 0.375rem;
+  line-height: 2;
+}
+
+.article-body blockquote {
+  margin-block: 1.25rem;
+  border-inline-start: 4px solid var(--color-primary);
+  background-color: color-mix(in oklab, var(--color-muted) 50%, transparent);
+  padding: 0.75rem 1rem;
+  font-style: italic;
+  color: var(--color-muted-foreground);
+}
+
+.article-body a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.article-body img {
+  margin-block: 1.5rem;
+  border-radius: var(--radius-lg);
+}
+
+.article-body strong {
+  font-weight: 700;
+  color: var(--color-foreground);
+}

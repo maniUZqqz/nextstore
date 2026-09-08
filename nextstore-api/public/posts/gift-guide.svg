@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img">
+  <defs>
+    <linearGradient id="bg" gradientTransform="rotate(160)">
+      <stop offset="0%" stop-color="#fee2e2"/>
+      <stop offset="100%" stop-color="#fecaca"/>
+    </linearGradient>
+    <pattern id="dots" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.6" fill="#991b1b" opacity="0.10"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect width="1200" height="675" fill="url(#dots)"/>
+
+  <circle cx="600" cy="337" r="190" fill="#ffffff" opacity="0.42"/>
+
+  <g transform="translate(516 253) scale(7)"
+     fill="none" stroke="#991b1b" stroke-width="1.5"
+     stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+    <path d="M3 10h18v11H3z M3 6h18v4H3z M12 6v15 M12 6C10 3 7 3 7 5s3 1 5 1Z M12 6c2-3 5-3 5-1s-3 1-5 1Z"/>
+  </g>
+</svg>

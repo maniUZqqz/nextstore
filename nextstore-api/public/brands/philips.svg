@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320" role="img" aria-label="P">
+  <rect width="320" height="320" rx="64" fill="#e0f2fe"/>
+  <text
+    x="160" y="160"
+    fill="#0c4a6e"
+    font-family="Segoe UI, Arial, Helvetica, sans-serif"
+    font-size="150"
+    font-weight="700"
+    letter-spacing="0"
+    text-anchor="middle"
+    dominant-baseline="central"
+  >P</text>
+</svg>

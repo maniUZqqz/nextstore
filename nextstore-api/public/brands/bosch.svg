@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320" role="img" aria-label="B">
+  <rect width="320" height="320" rx="64" fill="#dbeafe"/>
+  <text
+    x="160" y="160"
+    fill="#1e40af"
+    font-family="Segoe UI, Arial, Helvetica, sans-serif"
+    font-size="150"
+    font-weight="700"
+    letter-spacing="0"
+    text-anchor="middle"
+    dominant-baseline="central"
+  >B</text>
+</svg>
