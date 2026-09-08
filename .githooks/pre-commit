@@ -1,0 +1,111 @@
+#!/bin/sh
+#
+# هوک پیش از کامیت — بخش ۲۰ رودمپ.
+# =============================================================================
+# ⚠️ این فایل در `.githooks/` است نه `.git/hooks/`.
+#
+#    محتویات `.git/` هرگز وارد مخزن نمی‌شود، پس هوکی که آنجا بنشیند
+#    فقط روی همین کپی کار می‌کند و هر کس دیگری بدون آن کار می‌کند.
+#    با `core.hooksPath` این پوشه به گیت معرفی می‌شود:
+#
+#        git config core.hooksPath .githooks
+#
+#    (اسکریپت `scripts/setup-hooks.sh` همین کار را می‌کند.)
+#
+# ⚠️ تست‌ها اینجا اجرا **نمی‌شوند** — عمداً.
+#
+#    رودمپ اجرای Pest را در هوک پیشنهاد می‌دهد، ولی سوئیت کامل ۱۶
+#    ثانیه طول می‌کشد و هر کامیت را به یک مکث تبدیل می‌کند. نتیجه‌ی
+#    عملی چنین هوکی این است که آدم `--no-verify` را یاد می‌گیرد و از
+#    آن به بعد هیچ بررسی‌ای اجرا نمی‌شود.
+#
+#    اینجا فقط بررسی‌های سریع (زیر دو ثانیه) هستند؛ تست کامل جای
+#    خودش در CI است.
+
+set -e
+
+PHP="./tools/php/php.exe"
+
+# رنگ‌ها فقط وقتی خروجی به ترمینال می‌رود
+if [ -t 1 ]; then
+    RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; NC='\033[0m'
+else
+    RED=''; GREEN=''; YELLOW=''; NC=''
+fi
+
+fail() {
+    printf "%b✗ %s%b\n" "$RED" "$1" "$NC" >&2
+    printf "  برای رد کردن موقت:  git commit --no-verify\n" >&2
+    exit 1
+}
+
+# --- کدام فایل‌ها تغییر کرده‌اند؟ ---
+# فقط چیزی که واقعاً استیج شده بررسی می‌شود؛ اجرای لینتر روی کل پروژه
+# در هر کامیت، همان مکثی است که بالا از آن پرهیز شد.
+STAGED=$(git diff --cached --name-only --diff-filter=ACM)
+
+PHP_CHANGED=$(printf '%s\n' "$STAGED" | grep '^nextstore-api/.*\.php$' || true)
+TS_CHANGED=$(printf '%s\n' "$STAGED" | grep -E '^nextstore-web/.*\.(ts|tsx|mjs)$' || true)
+
+# --- بک‌اند: قالب‌بندی ---
+if [ -n "$PHP_CHANGED" ]; then
+    printf "%b→ بررسی قالب‌بندی PHP…%b\n" "$YELLOW" "$NC"
+
+    if [ ! -f "$PHP" ]; then
+        printf "  ⚠ %s پیدا نشد — بررسی PHP رد شد.\n" "$PHP"
+    else
+        (cd nextstore-api && "../$PHP" vendor/bin/pint --test --quiet) \
+            || fail "Pint شکست خورد. اجرا کن:  cd nextstore-api && ../tools/php/php.exe vendor/bin/pint"
+        printf "%b  ✓ Pint%b\n" "$GREEN" "$NC"
+    fi
+fi
+
+# --- فرانت‌اند: تایپ و لینت ---
+if [ -n "$TS_CHANGED" ]; then
+    printf "%b→ بررسی TypeScript…%b\n" "$YELLOW" "$NC"
+
+    (cd nextstore-web && npx --no-install tsc --noEmit) \
+        || fail "tsc خطا داد."
+    printf "%b  ✓ tsc%b\n" "$GREEN" "$NC"
+
+    # فقط فایل‌های استیج‌شده، نه کل پروژه
+    FILES=$(printf '%s\n' "$TS_CHANGED" | sed 's|^nextstore-web/||' | tr '\n' ' ')
+
+    # ⚠️ `--max-warnings=0` الزامی است.
+    #
+    #    پیکربندی این پروژه «متغیر بلااستفاده» را warning می‌داند نه
+    #    error، و ESLint با warning کد خروج ۰ می‌دهد. بدون این پرچم،
+    #    هوک اجرا می‌شد، warning را چاپ می‌کرد و کامیت را **رد نمی‌کرد** —
+    #    دقیقاً در اولین آزمون همین اتفاق افتاد.
+    #
+    #    پروژه همین الان صفر warning دارد، پس این سخت‌گیری چیزی را
+    #    نمی‌شکند و نگهش می‌دارد.
+    (cd nextstore-web && npx --no-install eslint --max-warnings=0 $FILES) \
+        || fail "ESLint خطا یا هشدار داد."
+    printf "%b  ✓ eslint%b\n" "$GREEN" "$NC"
+fi
+
+# --- بررسی نشت راز ---
+# ⚠️ ارزان‌ترین بررسی این فایل و مهم‌ترینش: رازی که یک بار commit شود،
+#    حتی پس از حذف، در تاریخچه می‌ماند.
+#
+# ⚠️ دو محافظ در برابر مثبت کاذب — هر دو از یک اشتباه واقعی آمدند:
+#
+#    ۱. خودِ همین فایل مستثنا می‌شود. نسخه‌ی اول، هنگام کامیت‌شدن،
+#       الگوهای داخل خودش را «راز» تشخیص داد و جلوی کامیت را گرفت.
+#
+#    ۲. الگوها **مقدار واقعی** می‌خواهند نه فقط نام کلید: `APP_KEY=base64:`
+#       باید حداقل ۲۰ نویسه پس از خود داشته باشد. بدون این، هر مستندی
+#       که نام یک کلید را توضیح می‌دهد مسدود می‌شد — و هوکی که مدام
+#       اشتباه می‌گیرد، هوکی است که خاموش می‌شود.
+SECRET_PATTERN='APP_KEY=base64:[A-Za-z0-9+/=]{20,}|sk_live_[A-Za-z0-9]{16,}|-----BEGIN [A-Z ]*PRIVATE KEY-----'
+
+SECRETS=$(git diff --cached -U0 -- . ':(exclude).githooks/*'     | grep -E '^\+' | grep -EI "$SECRET_PATTERN" || true)
+
+if [ -n "$SECRETS" ]; then
+    fail "به نظر می‌رسد یک راز در تغییرات هست. بررسی کن:
+$SECRETS"
+fi
+
+
+printf "%b✓ همه‌ی بررسی‌ها پاس شد%b\n" "$GREEN" "$NC"
