@@ -27,6 +27,15 @@ const EMPTY: SiteSettings = {
   socialTelegram: null,
   socialX: null,
   socialLinkedin: null,
+
+  /*
+   * ⚠️ مقادیر جایگزین با `config/shop.php` بک‌اند یکی‌اند.
+   *
+   *    این تنها جای کد فرانت است که عدد ارسال را تکرار می‌کند و
+   *    فقط برای وقتی است که API در دسترس نباشد — بهتر از نشان‌دادن
+   *    «۰ تومان» یا جای خالی وسط جمله.
+   */
+  shipping: { freeThreshold: 5_000_000, standard: 500_000, express: 1_200_000 },
 }
 
 /**

@@ -30,7 +30,7 @@
   "topbar": {
     "phone": "۰۲۱-۱۲۳۴۵۶۷۸",
     "support": "پشتیبانی ۲۴ ساعته",
-    "freeShipping": "ارسال رایگان سفارش‌های بالای ۵۰۰ هزار تومان",
+    "freeShipping": "ارسال رایگان سفارش‌های بالای {amount} {currency}",
     "trackOrder": "پیگیری سفارش",
     "storeLocator": "فروشگاه‌های ما"
   },
@@ -88,7 +88,7 @@
     "features": {
       "shipping": {
         "title": "ارسال رایگان",
-        "desc": "سفارش بالای ۵۰۰ هزار تومان"
+        "desc": "سفارش بالای {amount} {currency}"
       },
       "returns": {
         "title": "۷ روز مهلت مرجوعی",

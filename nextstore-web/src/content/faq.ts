@@ -82,7 +82,7 @@ export const faqContent: LocalizedContent<FaqContent> = {
           {
             question: 'ارسال کی رایگان می‌شود؟',
             answer:
-              'ارسال عادی برای سفارش‌های بالای ۵۰۰ هزار تومان رایگان است. ارسال سریع همیشه هزینه دارد، حتی بالای این مبلغ.',
+              'ارسال عادی برای سفارش‌های بالای {freeShipping} رایگان است. ارسال سریع همیشه هزینه دارد، حتی بالای این مبلغ.',
           },
           {
             question: 'چطور مرسوله را پیگیری کنم؟',
@@ -183,7 +183,7 @@ export const faqContent: LocalizedContent<FaqContent> = {
           {
             question: 'When is shipping free?',
             answer:
-              'Standard shipping is free on orders above 500,000 Toman. Express shipping always costs, even above that amount.',
+              'Standard shipping is free on orders above {freeShipping}. Express shipping always costs, even above that amount.',
           },
           {
             question: 'How do I track my parcel?',

@@ -30,7 +30,7 @@
   "topbar": {
     "phone": "+1 800 123 4567",
     "support": "24/7 Support",
-    "freeShipping": "Free shipping on orders over $50",
+    "freeShipping": "Free shipping on orders over {amount}",
     "trackOrder": "Track order",
     "storeLocator": "Store locator"
   },
@@ -88,7 +88,7 @@
     "features": {
       "shipping": {
         "title": "Free shipping",
-        "desc": "On orders over $50"
+        "desc": "On orders over {amount}"
       },
       "returns": {
         "title": "7-day returns",

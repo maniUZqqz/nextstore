@@ -26,6 +26,8 @@ import { Link } from '@/i18n/navigation'
 import type { Locale } from '@/i18n/routing'
 import { getHomeData } from '@/lib/api/catalog'
 import { getBanners } from '@/lib/api/banners'
+import { getSiteSettings } from '@/lib/api/settings'
+import { formatPrice, currencyLabel } from '@/lib/utils/format'
 import type { HomeData } from '@/types/product'
 import { HeroSlider } from '@/components/home/HeroSlider'
 import { CategoryCircles } from '@/components/home/CategoryCircles'
@@ -66,6 +68,19 @@ export default async function HomePage({
    *    می‌دهد، پس try/catch جداگانه لازم ندارد.
    */
   const banners = await getBanners(locale)
+
+  /*
+   * آستانه‌ی ارسال رایگان برای کارت خدمات.
+   *
+   * ⚠️ همان عددی که نوار بالای هدر تبلیغ می‌کند و همان عددی که سبد
+   *    خرید با آن حساب می‌کند — از `config/shop.php` بک‌اند. پیش‌تر
+   *    اینجا هم دستی در فایل ترجمه نوشته شده بود.
+   */
+  const settings = await getSiteSettings(locale)
+  const freeShipping = {
+    amount: formatPrice(settings.shipping.freeThreshold, locale as Locale),
+    currency: currencyLabel(locale as Locale),
+  }
 
   /** نوار خدمات فروشگاه. */
   const features = [
@@ -136,7 +151,14 @@ export default async function HomePage({
                   {t(`features.${key}.title`)}
                 </p>
                 <p className="text-xs leading-5 text-muted-foreground">
-                  {t(`features.${key}.desc`)}
+                  {/*
+                    ⚠️ فقط کارت «ارسال» پارامتر می‌گیرد؛ بقیه متن ثابت
+                       دارند. پاس‌دادن پارامتر اضافه به next-intl بی‌ضرر
+                       است، ولی این شرط صریح می‌گوید کدام متن پویاست.
+                  */}
+                  {key === 'shipping'
+                    ? t('features.shipping.desc', freeShipping)
+                    : t(`features.${key}.desc`)}
                 </p>
               </div>
             </li>

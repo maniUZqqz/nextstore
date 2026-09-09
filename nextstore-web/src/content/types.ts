@@ -48,3 +48,45 @@ export type LocalizedContent<T = ContentPage> = Record<Locale, T>
 export function pickLocale<T>(content: LocalizedContent<T>, locale: string): T {
   return content[locale as Locale] ?? content.fa
 }
+
+/**
+ * جای‌گذاری مقادیر پویا در متن صفحات محتوایی.
+ * ---------------------------------------------------------------------------
+ * ⚠️ باگی که این تابع حل می‌کند:
+ *
+ *    آستانه‌ی ارسال رایگان یک عدد است که در `config/shop.php` بک‌اند
+ *    تعریف شده و منطق پرداخت با آن حساب می‌کند. ولی همان عدد در متن
+ *    «سؤالات متداول» و «شیوه‌های ارسال» دستی نوشته شده بود.
+ *
+ *    یعنی روزی که فروشگاه آستانه را عوض کند، این صفحات به مشتری
+ *    عددی می‌گویند که صندوق قبولش ندارد — و مشتری می‌تواند همین
+ *    صفحه را اسکرین‌شات بگیرد و حق هم داشته باشد.
+ *
+ * ⚠️ جای‌گذاری روی **کل ساختار** انجام می‌شود، نه فقط پاراگراف‌ها:
+ *    عنوان بخش و قلم‌های فهرست هم ممکن است عدد داشته باشند و جا
+ *    انداختنشان یعنی نیمی از صفحه به‌روز و نیمی کهنه.
+ *
+ * ⚠️ جانگهدارِ ناشناخته **دست‌نخورده** می‌ماند و پاک نمی‌شود.
+ *    اگر «{prcie}» تایپ شود، دیدنش روی صفحه بهتر از ناپدید شدنش است:
+ *    متن ناقص به چشم می‌آید، جای خالی نه.
+ */
+export function interpolate<T>(content: T, values: Record<string, string>): T {
+  if (typeof content === 'string') {
+    return content.replace(
+      /\{(\w+)\}/g,
+      (match, key: string) => values[key] ?? match,
+    ) as T
+  }
+
+  if (Array.isArray(content)) {
+    return content.map((item) => interpolate(item, values)) as T
+  }
+
+  if (content && typeof content === 'object') {
+    return Object.fromEntries(
+      Object.entries(content).map(([key, value]) => [key, interpolate(value, values)]),
+    ) as T
+  }
+
+  return content
+}

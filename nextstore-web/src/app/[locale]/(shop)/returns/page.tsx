@@ -16,7 +16,8 @@ import type { Metadata } from 'next'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { ContentPageShell } from '@/components/common/ContentPageShell'
 import { returnsContent } from '@/content/support'
-import { pickLocale } from '@/content/types'
+import { pickLocale, interpolate } from '@/content/types'
+import { contentValues } from '@/content/values'
 
 export async function generateMetadata({
   params,
@@ -39,9 +40,20 @@ export default async function Page({
 
   const t = await getTranslations('footer')
 
+  /*
+   * ⚠️ مبالغ ارسال از `config/shop.php` بک‌اند درج می‌شوند، نه از
+   *    متن ثابت.
+   *
+   *    پیش‌تر همان اعداد داخل متن نوشته شده بودند و روزی که
+   *    فروشگاه نرخ را عوض می‌کرد، این صفحه به مشتری عددی
+   *    می‌گفت که صندوق قبولش نداشت — و مشتری می‌توانست همین
+   *    صفحه را اسکرین‌شات بگیرد و حق هم داشته باشد.
+   */
+  const values = await contentValues(locale)
+
   return (
     <ContentPageShell
-      content={pickLocale(returnsContent, locale)}
+      content={interpolate(pickLocale(returnsContent, locale), values)}
       breadcrumbLabel={t('links.returns')}
     />
   )

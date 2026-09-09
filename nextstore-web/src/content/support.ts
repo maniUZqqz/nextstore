@@ -35,15 +35,15 @@ export const shippingContent: LocalizedContent<ContentPage> = {
           'هنگام تکمیل خرید یکی از دو روش زیر را انتخاب می‌کنید:',
         ],
         bullets: [
-          'ارسال عادی — تحویل ۳ تا ۵ روز کاری، ۵۰ هزار تومان.',
-          'ارسال سریع — تحویل ۱ تا ۲ روز کاری، ۱۲۰ هزار تومان.',
+          'ارسال عادی — تحویل ۳ تا ۵ روز کاری، {standardShipping}.',
+          'ارسال سریع — تحویل ۱ تا ۲ روز کاری، {expressShipping}.',
         ],
       },
       {
         heading: 'هزینه‌ی ارسال',
         paragraphs: [
-          'ارسال عادی ۵۰ هزار تومان است و برای سفارش‌های بالای ۵۰۰ هزار تومان رایگان می‌شود.',
-          'ارسال سریع ۱۲۰ هزار تومان است و — برخلاف ارسال عادی — بالای آستانه هم رایگان نمی‌شود، چون هزینه‌ی واقعی تحویل فوری را پوشش می‌دهد.',
+          'ارسال عادی {standardShipping} است و برای سفارش‌های بالای {freeShipping} رایگان می‌شود.',
+          'ارسال سریع {expressShipping} است و — برخلاف ارسال عادی — بالای آستانه هم رایگان نمی‌شود، چون هزینه‌ی واقعی تحویل فوری را پوشش می‌دهد.',
           'مبلغ دقیق پیش از پرداخت در خلاصه‌ی سفارش نمایش داده می‌شود؛ هیچ هزینه‌ای پس از ثبت سفارش اضافه نمی‌شود.',
         ],
       },
@@ -77,15 +77,15 @@ export const shippingContent: LocalizedContent<ContentPage> = {
         heading: 'Delivery options',
         paragraphs: ['At checkout you choose one of two options:'],
         bullets: [
-          'Standard — 3 to 5 working days, 50,000 Toman.',
-          'Express — 1 to 2 working days, 120,000 Toman.',
+          'Standard - 3 to 5 working days, {standardShipping}.',
+          'Express - 1 to 2 working days, {expressShipping}.',
         ],
       },
       {
         heading: 'Shipping cost',
         paragraphs: [
-          'Standard shipping costs 50,000 Toman and is free on orders above 500,000 Toman.',
-          'Express shipping costs 120,000 Toman and — unlike standard — is never free, because it covers the real cost of urgent delivery.',
+          'Standard shipping costs {standardShipping} and is free on orders above {freeShipping}.',
+          'Express shipping costs {expressShipping} and - unlike standard - is never free, because it covers the real cost of urgent delivery.',
           'The exact amount appears in your order summary before payment; nothing is added after you place the order.',
         ],
       },

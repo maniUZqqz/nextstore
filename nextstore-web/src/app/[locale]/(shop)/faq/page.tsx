@@ -18,7 +18,8 @@ import { Link } from '@/i18n/navigation'
 import { Breadcrumb } from '@/components/common/Breadcrumb'
 import { FaqAccordion } from '@/components/common/FaqAccordion'
 import { faqContent } from '@/content/faq'
-import { pickLocale } from '@/content/types'
+import { pickLocale, interpolate } from '@/content/types'
+import { contentValues } from '@/content/values'
 
 export async function generateMetadata({
   params,
@@ -42,7 +43,19 @@ export default async function FaqPage({
   const t = await getTranslations('faq')
   const tNav = await getTranslations('nav')
 
-  const content = pickLocale(faqContent, locale)
+  /*
+   * ⚠️ مبالغ ارسال از `config/shop.php` بک‌اند درج می‌شوند، نه از متن
+   *    ثابت.
+   *
+   *    پیش‌تر عدد داخل پاسخ پرسش‌ها نوشته شده بود؛ روزی که فروشگاه
+   *    نرخ را عوض کند، این صفحه به مشتری عددی می‌گوید که صندوق
+   *    قبولش ندارد — و مشتری می‌تواند همین صفحه را اسکرین‌شات بگیرد
+   *    و حق هم داشته باشد.
+   */
+  const content = interpolate(
+    pickLocale(faqContent, locale),
+    await contentValues(locale),
+  )
 
   return (
     <main

@@ -13,10 +13,11 @@
 
 import { getTranslations } from 'next-intl/server'
 import { getSiteSettings } from '@/lib/api/settings'
-import { toAsciiDigits } from '@/lib/utils/format'
+import { toAsciiDigits, formatPrice, currencyLabel } from '@/lib/utils/format'
 import { Phone, Truck, PackageSearch, Heart } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { getCategories } from '@/lib/api/catalog'
+import type { Locale } from '@/i18n/routing'
 import type { Category } from '@/types/product'
 import { SearchBar } from './SearchBar'
 import { CartButton } from './CartButton'
@@ -53,6 +54,20 @@ export async function Header({ locale }: { locale: string }) {
 
   /* یک منبع برای شماره — هم متن دیده‌شده و هم مقصد لینک از همین می‌آید */
   const phone = settings.contactPhone ?? tTop('phone')
+
+  /*
+   * آستانه‌ی ارسال رایگان — از `config/shop.php` بک‌اند.
+   *
+   * ⚠️ پیش‌تر عدد داخل خودِ متن ترجمه نوشته شده بود («…بالای ۵۰۰ هزار
+   *    تومان») و همان عدد در چهار جای دیگر هم تکرار می‌شد. در نسخه‌ی
+   *    انگلیسی «$50» نوشته بود، در حالی که آستانه ۵٬۰۰۰٬۰۰۰ ریال است
+   *    که با نرخ تبدیل خود پروژه حدود ۸ دلار می‌شود — یعنی سایت
+   *    انگلیسی شش برابر اشتباه وعده می‌داد.
+   */
+  const freeShipping = {
+    amount: formatPrice(settings.shipping.freeThreshold, locale as Locale),
+    currency: currencyLabel(locale as Locale),
+  }
 
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md">
@@ -93,7 +108,7 @@ export async function Header({ locale }: { locale: string }) {
           <div className="flex items-center gap-5">
             <span className="flex items-center gap-1.5 font-medium text-success">
               <Truck className="size-3.5" aria-hidden="true" />
-              {tTop('freeShipping')}
+              {tTop('freeShipping', freeShipping)}
             </span>
             <Link href="/account/orders" className="flex items-center gap-1.5 hover:text-foreground">
               <PackageSearch className="size-3.5" aria-hidden="true" />
