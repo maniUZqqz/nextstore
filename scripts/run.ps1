@@ -600,6 +600,38 @@ if ($Stop) {
         }
     }
 
+    <#
+      کارگر صف پورتی ندارد، پس منطق مبتنی بر پورت بالا آن را نمی‌بیند.
+
+      ⚠️ بدون این بلوک، `run.bat -Stop` می‌گفت «همه متوقف شدند» ولی
+         کارگر زنده می‌ماند: اجرای بعدی run.bat کارگر دومی می‌ساخت و
+         هر بار یکی بیشتر. پس از چند بار، چند فرایند PHP همزمان از یک
+         صف برمی‌داشتند.
+
+         شناسایی با خط فرمان انجام می‌شود چون همه‌شان `php.exe` هستند و
+         از روی نام قابل تفکیک نیستند.
+    #>
+    $queueWorkers = @(
+        Get-CimInstance Win32_Process -Filter "Name = 'php.exe'" -ErrorAction SilentlyContinue |
+            Where-Object { $_.CommandLine -like '*queue:work*' }
+    )
+
+    if ($queueWorkers.Count -eq 0) {
+        Write-Info 'کارگر صف: در حال اجرا نبود'
+    }
+    else {
+        foreach ($worker in $queueWorkers) {
+            try {
+                Stop-Process -Id ([int]$worker.ProcessId) -Force -ErrorAction Stop
+                Write-Ok "کارگر صف متوقف شد (شناسه $($worker.ProcessId))"
+            }
+            catch {
+                Write-Warn "کارگر صف با شناسه $($worker.ProcessId) بسته نشد"
+                $stopFailed = $true
+            }
+        }
+    }
+
     Write-Host ""
     if ($stopFailed) { exit 3 }
     exit 0
@@ -955,6 +987,29 @@ Start-Process -FilePath $Php `
     -RedirectStandardError  (Join-Path $LogDir 'api.error.log')
 
 Write-Info 'بک‌اند در حال بالا آمدن...'
+
+# --- کارگر صف ---
+#
+# ⚠️ بدون این، ایمیل‌ها فرستاده نمی‌شوند و هیچ خطایی هم نمی‌دهند.
+#
+#    ایمیل تأیید سفارش و خوش‌آمد با ShouldQueue در جدول `jobs` صف
+#    می‌شوند تا خرید و ثبت‌نام منتظر سرور SMTP نمانند. ولی کاری که در
+#    صف بنشیند و کارگری نباشد، فقط در جدول می‌ماند: کاربر پیام موفقیت
+#    می‌بیند، لاگ خالی است، و ایمیل هرگز نمی‌رسد.
+#
+# ⚠️ `--tries=3` و `--max-time=3600`:
+#
+#    سه تلاش، چون قطعی موقت شبکه رایج‌ترین علت شکست است. سقف یک‌ساعته
+#    هم برای این است که فرایند کارگر به‌مرور حافظه نشت می‌کند؛ پس از
+#    یک ساعت خودش تمام می‌شود و اجرای بعدی run.bat تازه‌اش می‌کند.
+Start-Process -FilePath $Php `
+    -ArgumentList 'artisan', 'queue:work', '--tries=3', '--max-time=3600' `
+    -WorkingDirectory $ApiPath `
+    -WindowStyle Hidden `
+    -RedirectStandardOutput (Join-Path $LogDir 'queue.log') `
+    -RedirectStandardError  (Join-Path $LogDir 'queue.error.log')
+
+Write-Info 'کارگر صف اجرا شد (ایمیل‌های پس‌زمینه).'
 
 # --- فرانت‌اند Next.js ---
 $nextBin = Join-Path $WebPath 'node_modules\next\dist\bin\next'

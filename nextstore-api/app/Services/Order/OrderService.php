@@ -9,11 +9,14 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Notifications\OrderPlacedNotification;
 use App\Services\Cart\CartService;
 use App\Services\Cart\CouponService;
 use App\Services\Notification\NotificationService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 /**
  * سرویس ثبت و مدیریت سفارش — حساس‌ترین بخش منطق تجاری پروژه.
@@ -80,7 +83,7 @@ class OrderService
             ]);
         }
 
-        return DB::transaction(function () use ($user, $cart, $address, $shippingMethod, $note) {
+        $order = DB::transaction(function () use ($user, $cart, $address, $shippingMethod, $note) {
 
             $subtotal = 0;
             $itemsData = [];
@@ -258,6 +261,31 @@ class OrderService
 
             return $order->load('items');
         });
+
+        /*
+         * ⚠️ ایمیل **بیرون** از تراکنش و **در صف**.
+         *
+         *    بیرون از تراکنش، چون ایمیلی که از سفارشی خبر بدهد که
+         *    برگشته، بدتر از نفرستادنش است.
+         *
+         *    در صف، چون بدون آن مشتری روی دکمه‌ی «ثبت سفارش» می‌زند و
+         *    تا جواب سرور SMTP منتظر می‌ماند. اگر آن سرویس کند یا قطع
+         *    باشد، **درخواست تایم‌اوت می‌شود در حالی که سفارش ثبت
+         *    شده** — مشتری خطا می‌بیند و دوباره سفارش می‌دهد.
+         *
+         * ⚠️ خطای صف هم بلعیده می‌شود: نرسیدن ایمیل نباید خرید موفق را
+         *    به خطا تبدیل کند.
+         */
+        try {
+            $user->notify(new OrderPlacedNotification($order, app()->getLocale()));
+        } catch (Throwable $e) {
+            Log::warning('ارسال ایمیل تأیید سفارش ناموفق بود', [
+                'order' => $order->order_number,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return $order;
     }
 
     /**

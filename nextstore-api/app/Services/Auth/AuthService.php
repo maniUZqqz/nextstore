@@ -4,9 +4,12 @@ namespace App\Services\Auth;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Notifications\WelcomeNotification;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 /**
  * سرویس احراز هویت — تمام منطق ثبت‌نام، ورود و خروج.
@@ -46,6 +49,23 @@ class AuthService
         ]);
 
         $user->recordLogin();
+
+        /*
+         * ⚠️ ایمیل خوش‌آمد در صف می‌رود و خطایش بلعیده می‌شود.
+         *
+         *    بدون این، ثبت‌نام تا جواب سرور SMTP معطل می‌ماند و اگر آن
+         *    سرویس قطع باشد کاربر خطا می‌بیند — در حالی که حسابش ساخته
+         *    شده و دفعه‌ی بعد «این ایمیل قبلاً ثبت شده» می‌گیرد و
+         *    عملاً گیر می‌افتد.
+         */
+        try {
+            $user->notify(new WelcomeNotification(app()->getLocale()));
+        } catch (Throwable $e) {
+            Log::warning('ارسال ایمیل خوش‌آمد ناموفق بود', [
+                'user' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return [
             'user' => $user,
