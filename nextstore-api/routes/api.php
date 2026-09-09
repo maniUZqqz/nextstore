@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminSettingController;
 use App\Http\Controllers\Api\V1\Admin\AdminTicketController;
 use App\Http\Controllers\Api\V1\Admin\DashboardController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Customer\AddressController;
 use App\Http\Controllers\Api\V1\Customer\OrderController;
 use App\Http\Controllers\Api\V1\Customer\ProfileController;
@@ -174,6 +175,24 @@ Route::prefix('v1')->group(function () {
             Route::post('register', [AuthController::class, 'register'])->name('api.auth.register');
             Route::post('login', [AuthController::class, 'login'])->name('api.auth.login');
         });
+
+        /*
+         * بازیابی رمز عبور — هر کدام سطل نرخ خودش را دارد.
+         *
+         * ⚠️ عمداً **بیرون** از `throttle:auth` هستند.
+         *
+         *    نسخه‌ی اول داخلش بودند و نتیجه‌اش این می‌شد: کاربری که ۵
+         *    بار رمزش را اشتباه زده — یعنی دقیقاً همان کسی که به
+         *    بازیابی نیاز دارد — نمی‌توانست پیوند بگیرد. توضیح
+         *    هر محدودکننده در `AppServiceProvider` است.
+         */
+        Route::post('forgot-password', [PasswordResetController::class, 'forgot'])
+            ->middleware('throttle:password-forgot')
+            ->name('api.auth.forgot-password');
+
+        Route::post('reset-password', [PasswordResetController::class, 'reset'])
+            ->middleware('throttle:password-reset')
+            ->name('api.auth.reset-password');
 
         /* مسیرهای نیازمند توکن معتبر */
         Route::middleware('auth:sanctum')->group(function () {

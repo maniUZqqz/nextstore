@@ -18,4 +18,14 @@ return [
     'logged_out' => 'Signed out successfully.',
     'logged_out_all' => 'Signed out from all devices.',
     'unauthenticated' => 'You must sign in to access this section.',
+
+    /* --- بازیابی رمز عبور --- */
+    'reset_link_sent' => 'If that email is registered with us, a reset link has been sent to it. Check your inbox and spam folder.',
+    'reset_token_invalid' => 'This link is not valid or has expired. Please request a new reset.',
+    'reset_token_missing' => 'The reset link is incomplete. Open it again from your email.',
+    'password_reset' => 'Your password has been changed. You can sign in now.',
+    'email_required' => 'Please enter your email.',
+    'email_invalid' => 'That email is not valid.',
+    'password_required' => 'Please enter a password.',
+    'password_mismatch' => 'The two passwords do not match.',
 ];

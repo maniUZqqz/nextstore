@@ -108,3 +108,31 @@ export async function getMe(): Promise<User> {
   const response = await api.get<ApiResponse<User>>('/auth/me')
   return response.data
 }
+
+/* ========================= بازیابی رمز عبور ========================= */
+
+/**
+ * درخواست پیوند بازیابی.
+ *
+ * ⚠️ پاسخ **همیشه** موفق است، چه ایمیل وجود داشته باشد چه نه.
+ *
+ *    بک‌اند عمداً تفاوت را پنهان می‌کند تا این اندپوینت به ابزار
+ *    شمارش کاربر تبدیل نشود. یعنی فرم نباید «ایمیل پیدا نشد» نشان
+ *    دهد — چنین پیامی همان چیزی را لو می‌دهد که بک‌اند پنهانش کرده.
+ */
+export async function forgotPassword(email: string, locale?: string) {
+  return api.post<{ message: string }>('/auth/forgot-password', { email }, { locale })
+}
+
+/** بازنشانی رمز با توکنی که در ایمیل آمده. */
+export async function resetPassword(
+  input: {
+    token: string
+    email: string
+    password: string
+    password_confirmation: string
+  },
+  locale?: string,
+) {
+  return api.post<{ message: string }>('/auth/reset-password', input, { locale })
+}

@@ -304,7 +304,36 @@
     "networkError": "Could not reach the server",
     "genericError": "Something went wrong, please try again",
     "demoAccounts": "Demo accounts",
-    "fillDemo": "Fill automatically"
+    "fillDemo": "Fill automatically",
+    "forgot": {
+      "title": "Reset your password",
+      "subtitle": "Enter your account email and we will send you a link to choose a new password.",
+      "submit": "Send reset link",
+      "sentTitle": "Email sent",
+      "sentBody": "If that address is registered with us, a reset link has been sent to:",
+      "spamHint": "The email arrives within a few minutes. If it does not, check your spam folder - the link is valid for 60 minutes.",
+      "backToLogin": "Back to sign in",
+      "tryAnother": "I mistyped my email",
+      "remembered": "Remembered your password?",
+      "tooMany": "Too many requests in a row. Wait a minute and try again.",
+      "failed": "The link could not be sent. Check your connection."
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "subtitle": "Pick a new password for your account.",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "passwordHint": "At least 8 characters, with letters and numbers.",
+      "submit": "Save new password",
+      "invalidTitle": "The link is incomplete",
+      "invalidBody": "This address carries no reset token. The link was probably cut off by your email app, or typed by hand.",
+      "requestAgain": "Request a new link",
+      "doneTitle": "Password changed",
+      "doneBody": "Sign in with your new password. You will be taken to the sign-in page shortly.",
+      "goToLogin": "Go to sign in",
+      "tooMany": "Too many requests in a row. Wait a minute.",
+      "failed": "The password could not be saved. Check your connection."
+    }
   },
   "account": {
     "dashboard": "Dashboard",
