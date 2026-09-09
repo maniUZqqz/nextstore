@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 /**
@@ -14,6 +15,8 @@ use Illuminate\Http\Request;
  *   لیست محصولات ممکن است ۲۴ آیتم داشته باشد. اگر توضیحات کامل و کل
  *   گالری هر محصول را بفرستیم، حجم پاسخ چند برابر می‌شود و صفحه کند
  *   بارگذاری می‌گردد. اصل: هر اندپوینت دقیقاً همان چیزی را بفرستد که لازم است.
+ *
+ * @mixin Product
  */
 class ProductDetailResource extends ProductResource
 {

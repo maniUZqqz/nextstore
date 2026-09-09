@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,6 +17,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *
  * ⚠️ نکته مهم: خروجی این کلاس، نام فیلدها را camelCase می‌کند تا با
  *    قرارداد TypeScript در فرانت‌اند هماهنگ باشد.
+ *
+ * @mixin Product
  */
 class ProductResource extends JsonResource
 {

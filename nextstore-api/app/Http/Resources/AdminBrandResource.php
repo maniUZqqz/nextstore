@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -10,6 +11,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *
  * ⚠️ مثل دسته‌بندی، فیلدهای چندزبانه خام برگردانده می‌شوند تا فرم
  *    دوزبانه بتواند هر دو زبان را هم‌زمان نشان دهد و ذخیره کند.
+ *
+ * @mixin Brand
  */
 class AdminBrandResource extends JsonResource
 {

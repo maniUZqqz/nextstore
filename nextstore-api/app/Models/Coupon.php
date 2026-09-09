@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use App\Enums\CouponType;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
 
 /**
  * کد تخفیف.
@@ -64,6 +64,7 @@ class Coupon extends Model
      * ===================================================================== */
 
     /** رکوردهای مصرف این کوپن. */
+    /** @return HasMany<CouponUsage, $this> */
     public function usages(): HasMany
     {
         return $this->hasMany(CouponUsage::class);
@@ -128,8 +129,16 @@ class Coupon extends Model
         return $subtotal >= $this->min_order_total;
     }
 
-    /** تاریخ انقضا برای نمایش — تهی یعنی بدون انقضا. */
-    public function expiresAt(): ?Carbon
+    /**
+     * تاریخ انقضا برای نمایش — تهی یعنی بدون انقضا.
+     *
+     * ⚠️ نوع بازگشتی `CarbonInterface` است نه `Illuminate\Support\Carbon`.
+     *
+     *    از لاراول ۱۱ کست `datetime` نمونه‌ی `Carbon\Carbon` می‌سازد
+     *    که زیرکلاس آن یکی نیست. اعلام نوع اشتباه، هر تحلیل ایستایی
+     *    را گمراه می‌کرد بی‌آنکه در زمان اجرا خطایی بدهد.
+     */
+    public function expiresAt(): ?CarbonInterface
     {
         return $this->expires_at;
     }

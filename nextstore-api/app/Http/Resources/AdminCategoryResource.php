@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,6 +15,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *    همان دلیل AdminPostDetailResource: فرم ویرایش دو تب دارد و
  *    اگر فقط زبان جاری بیاید، ذخیره‌ی فرم ترجمه‌ی زبان دیگر را
  *    پاک می‌کند.
+ *
+ * @mixin Category
  */
 class AdminCategoryResource extends JsonResource
 {

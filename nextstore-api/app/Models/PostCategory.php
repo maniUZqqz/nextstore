@@ -37,6 +37,7 @@ class PostCategory extends Model
     }
 
     /** مقالات این دسته. */
+    /** @return HasMany<Post, $this> */
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
@@ -49,6 +50,8 @@ class PostCategory extends Model
      *    شمارش مقالات یک دسته در چند جا لازم است (فهرست دسته‌ها،
      *    سربرگ صفحه‌ی دسته). اگر هر بار دستی فیلتر می‌شد، یک جا
      *    فراموش می‌شد و پیش‌نویس‌ها در شمارش عمومی می‌آمدند.
+     *
+     * @return HasMany<Post, $this>
      */
     public function publishedPosts(): HasMany
     {

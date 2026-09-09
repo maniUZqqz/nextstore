@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
@@ -22,6 +23,8 @@ use Illuminate\Support\Carbon;
  *
  * ⚠️ رمز عبور و توکن‌ها هرگز بیرون نمی‌روند — `$hidden` مدل آن‌ها را
  *    می‌گیرد و اینجا هم هیچ‌کدام صریحاً نوشته نشده‌اند.
+ *
+ * @mixin User
  */
 class AdminCustomerResource extends JsonResource
 {

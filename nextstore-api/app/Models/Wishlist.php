@@ -20,12 +20,14 @@ class Wishlist extends Model
     protected $fillable = ['user_id', 'product_id'];
 
     /** کاربر مالک این علاقه‌مندی. */
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     /** محصول پسندیده‌شده. */
+    /** @return BelongsTo<Product, $this> */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

@@ -288,7 +288,16 @@ class CatalogSeeder extends Seeder
                 'slug' => $parentData['slug'],
                 'icon' => $parentData['icon'],
                 'is_active' => true,
-                'is_featured' => $parentData['featured'] ?? false,
+                /*
+                 * ⚠️ بدون `?? false`.
+                 *
+                 *    هر شش دسته‌ی سطح اول این کلید را دارند. با
+                 *    مقدار پیش‌فرض، اگر روزی کسی دسته‌ی هفتمی اضافه
+                 *    کند و کلید را جا بیندازد، بی‌صدا «شاخص نیست»
+                 *    می‌شود. بدون آن، هم PHP هشدار می‌دهد و هم
+                 *    تحلیل ایستا همان لحظه می‌گیردش.
+                 */
+                'is_featured' => $parentData['featured'],
                 'sort_order' => $order++,
             ]);
 

@@ -86,7 +86,16 @@ class AdminOrderController extends Controller
         ]);
 
         $target = OrderStatus::tryFrom($validated['status']);
-        abort_unless($target, 422, __('shop.invalid_status'));
+
+        /*
+         * ⚠️ مقایسه‌ی صریح با null، نه تکیه بر صدق‌سنجی.
+         *
+         *    `abort_unless` بولین می‌خواهد و enum را ضمنی تبدیل
+         *    می‌کند. امروز درست کار می‌کند، ولی اگر روزی وضعیتی با
+         *    مقدار صفر یا رشته‌ی خالی اضافه شود، بی‌صدا «نامعتبر»
+         *    شمرده می‌شود.
+         */
+        abort_unless($target !== null, 422, __('shop.invalid_status'));
 
         /* کد رهگیری و یادداشت پیش از تغییر وضعیت ثبت می‌شوند */
         $extra = array_filter([

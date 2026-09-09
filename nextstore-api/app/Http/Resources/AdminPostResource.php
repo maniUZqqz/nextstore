@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -11,6 +12,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * نمای فهرست است، نه فرم ویرایش: فقط ستون‌هایی که در جدول دیده
  * می‌شوند. بدنه‌ی مقاله عمداً نیست — فرستادن ده بدنه‌ی HTML در یک
  * صفحه‌ی فهرست، پاسخ را بی‌دلیل ده‌ها کیلوبایت می‌کند.
+ *
+ * @mixin Post
  */
 class AdminPostResource extends JsonResource
 {

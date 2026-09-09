@@ -27,6 +27,7 @@ class TicketMessage extends Model
     }
 
     /** تیکتی که این پیام به آن تعلق دارد. */
+    /** @return BelongsTo<Ticket, $this> */
     public function ticket(): BelongsTo
     {
         return $this->belongsTo(Ticket::class);
@@ -38,6 +39,7 @@ class TicketMessage extends Model
      * ممکن است null باشد اگر حساب کاربری بعداً حذف شده باشد —
      * پیام می‌ماند تا تاریخچه‌ی گفتگو نصفه نشود.
      */
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -105,30 +105,38 @@ class Product extends Model
      * ===================================================================== */
 
     /** نظرات ثبت‌شده روی این محصول — شامل تأییدنشده‌ها. */
+    /** @return HasMany<Review, $this> */
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
 
     /** دسته‌بندی این محصول. */
+    /** @return BelongsTo<Category, $this> */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
     /** برند سازنده این محصول. */
+    /** @return BelongsTo<Brand, $this> */
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
     }
 
     /** تمام تصاویر گالری، مرتب‌شده بر اساس ترتیب نمایش. */
+    /** @return HasMany<ProductImage, $this> */
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
-    /** تصویر شاخص — همان که در کارت محصول نمایش داده می‌شود. */
+    /**
+     * تصویر شاخص — همان که در کارت محصول نمایش داده می‌شود.
+     *
+     * @return HasMany<ProductImage, $this>
+     */
     public function primaryImage(): HasMany
     {
         return $this->hasMany(ProductImage::class)->where('is_primary', true);

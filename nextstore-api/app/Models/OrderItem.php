@@ -46,6 +46,7 @@ class OrderItem extends Model
     }
 
     /** سفارشی که این قلم به آن تعلق دارد. */
+    /** @return BelongsTo<Order, $this> */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
@@ -56,6 +57,7 @@ class OrderItem extends Model
      * ممکن است null باشد اگر محصول از کاتالوگ حذف شده باشد —
      * در این حالت قلم سفارش همچنان نام و قیمت خودش را دارد.
      */
+    /** @return BelongsTo<Product, $this> */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

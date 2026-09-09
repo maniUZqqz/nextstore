@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\OrderStatus;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 /**
@@ -18,6 +19,8 @@ use Illuminate\Http\Request;
  *    می‌دهد. اگر فرانت‌اند خودش قواعد انتقال را تکرار می‌کرد، با
  *    اولین تغییر در OrderStatus دو طرف از هم جدا می‌شدند و ادمین
  *    گزینه‌ای می‌دید که سرور ردش می‌کند.
+ *
+ * @mixin Order
  */
 class AdminOrderDetailResource extends OrderDetailResource
 {

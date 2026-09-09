@@ -20,12 +20,14 @@ class ReviewVote extends Model
     protected $fillable = ['review_id', 'user_id'];
 
     /** نظری که به آن رأی داده شده. */
+    /** @return BelongsTo<Review, $this> */
     public function review(): BelongsTo
     {
         return $this->belongsTo(Review::class);
     }
 
     /** رأی‌دهنده. */
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 /**
@@ -17,6 +18,8 @@ use Illuminate\Http\Request;
  *
  * از ProductResource ارث می‌برد تا همه‌ی فیلدهای مشترک (قیمت، تصویر،
  * دسته، برند) یک بار نوشته شوند.
+ *
+ * @mixin Product
  */
 class AdminProductResource extends ProductResource
 {

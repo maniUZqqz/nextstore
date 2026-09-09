@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -10,6 +11,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *
  * بدون پیام‌های گفتگو: فهرستی با بیست تیکت نباید صدها پیام را هم
  * با خود بیاورد. فقط پیش‌نمایش آخرین پیام می‌آید.
+ *
+ * @mixin Ticket
  */
 class TicketResource extends JsonResource
 {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 /**
@@ -14,6 +15,8 @@ use Illuminate\Http\Request;
  * ⚠️ نام گیرنده از *عکس لحظه‌ای* داخل سفارش خوانده می‌شود، نه از
  *    جدول کاربران. اگر کاربر بعداً نامش را عوض کند یا حسابش حذف
  *    شود، سند مالی نباید تغییر کند.
+ *
+ * @mixin Order
  */
 class AdminOrderResource extends OrderResource
 {

@@ -2,11 +2,14 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * تبدیل مدل Brand به خروجی JSON.
+ *
+ * @mixin Brand
  */
 class BrandResource extends JsonResource
 {

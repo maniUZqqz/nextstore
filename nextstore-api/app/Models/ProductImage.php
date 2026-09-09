@@ -38,6 +38,7 @@ class ProductImage extends Model
     }
 
     /** محصولی که این تصویر به آن تعلق دارد. */
+    /** @return BelongsTo<Product, $this> */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

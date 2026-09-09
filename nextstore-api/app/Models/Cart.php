@@ -32,12 +32,14 @@ class Cart extends Model
     }
 
     /** کاربر مالک سبد (برای مهمان null). */
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     /** اقلام داخل سبد. */
+    /** @return HasMany<CartItem, $this> */
     public function items(): HasMany
     {
         return $this->hasMany(CartItem::class);
@@ -78,6 +80,7 @@ class Cart extends Model
      *    اعمال و ثبت سفارش منقضی شود. اعتبارش هر بار در CouponService
      *    بررسی می‌شود.
      */
+    /** @return BelongsTo<Coupon, $this> */
     public function coupon(): BelongsTo
     {
         return $this->belongsTo(Coupon::class);

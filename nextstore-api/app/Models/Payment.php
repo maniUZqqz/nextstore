@@ -47,6 +47,7 @@ class Payment extends Model
     protected $hidden = ['gateway_response'];
 
     /** سفارش مربوط به این پرداخت. */
+    /** @return BelongsTo<Order, $this> */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);

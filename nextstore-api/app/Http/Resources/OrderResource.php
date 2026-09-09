@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -10,6 +11,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *
  * سبک نگه داشته شده: اقلام سفارش فقط در نمای جزئیات می‌آیند،
  * وگرنه فهرست ۲۰ سفارشی حجم زیادی پیدا می‌کند.
+ *
+ * @mixin Order
  */
 class OrderResource extends JsonResource
 {

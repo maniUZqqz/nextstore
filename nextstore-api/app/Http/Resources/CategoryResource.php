@@ -3,9 +3,17 @@
 namespace App\Http\Resources;
 
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+/*
+ * ⚠️ مجموعه‌ی **Eloquent** نه Support.
+ *
+ *    روابط لاراول همیشه `Eloquent\Collection` برمی‌گردانند.
+ *    اعلام `Support\Collection` گرچه ابرکلاسش است، نوع دقیق
+ *    را از دست می‌داد و متدهای مخصوص مدل روی نتیجه گم
+ *    می‌شدند.
+ */
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Collection;
 
 /**
  * تبدیل مدل Category به خروجی JSON.
@@ -13,6 +21,8 @@ use Illuminate\Support\Collection;
  * قابلیت بازگشتی: اگر رابطه‌ی childrenRecursive بارگذاری شده باشد،
  * زیردسته‌ها هم با همین Resource تبدیل می‌شوند و نتیجه یک درخت کامل
  * JSON است که فرانت‌اند می‌تواند مستقیماً منوی چندسطحی بسازد.
+ *
+ * @mixin Category
  */
 class CategoryResource extends JsonResource
 {

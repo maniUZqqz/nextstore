@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "shots": "node scripts/shots.mjs"
+    "typecheck": "tsc --noEmit",
+    "shots": "node scripts/shots.mjs",
+    "test:e2e": "node scripts/run-e2e.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

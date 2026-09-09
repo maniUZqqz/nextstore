@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
@@ -15,6 +16,16 @@ use Illuminate\Support\Facades\Cache;
  * ⚠️ کش با هر نوشتن باطل می‌شود — نه با انقضای زمانی. مدیری که تلفن
  *    فروشگاه را عوض می‌کند نباید ده دقیقه منتظر بماند و شک کند که
  *    ذخیره شده یا نه.
+ *
+ * ⚠️ نوع واقعی ستون `value` هرچه JSON بپذیرد است، نه فقط آرایه.
+ *
+ *    کست `array` در لاراول یعنی `json_decode(..., true)`. برای
+ *    تنظیم دوزبانه‌ای مثل `site_name` یک آرایه برمی‌گردد، ولی برای
+ *    تنظیم ساده‌ای که مقدارش `"NextStore"` ذخیره شده، همان **رشته**
+ *    را می‌دهد. نام کست گمراه‌کننده است و `Setting::get()` هم
+ *    دقیقاً به همین دلیل با `is_string()` هر دو حالت را می‌سنجد.
+ *
+ * @property array<string, string>|string|null $value
  */
 class Setting extends Model
 {
@@ -23,9 +34,37 @@ class Setting extends Model
     protected function casts(): array
     {
         return [
-            'value' => 'array',
+            /*
+             * ⚠️ `value` عمداً کست **ندارد** و با accessor پایین
+             *    مدیریت می‌شود.
+             *
+             *    کست `array` اینجا بود و دروغ می‌گفت: در لاراول یعنی
+             *    `json_decode(..., true)` که برای مقدار دوزبانه آرایه
+             *    می‌دهد ولی برای `"NextStore"` همان **رشته** را. هر
+             *    تحلیل ایستایی آرایه فرض می‌کرد و شاخه‌ی رشته‌ای —
+             *    که نیمی از تنظیمات از آن عبور می‌کنند — «کد مرده»
+             *    شمرده می‌شد.
+             */
             'is_translatable' => 'boolean',
         ];
+    }
+
+    /**
+     * مقدار تنظیم — همان چیزی که در JSON ذخیره شده.
+     *
+     * ⚠️ خروجی `mixed` است و این دقیق‌ترین چیزی است که می‌شود گفت:
+     *    ستون هم آرایه‌ی دوزبانه نگه می‌دارد و هم رشته‌ی ساده. هر
+     *    مصرف‌کننده باید خودش تفکیک کند — `Setting::get()` همین کار
+     *    را با `is_array` و `is_string` انجام می‌دهد.
+     *
+     * @return Attribute<mixed, mixed>
+     */
+    protected function value(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $raw) => $raw === null ? null : json_decode($raw, true),
+            set: fn (mixed $value) => json_encode($value, JSON_UNESCAPED_UNICODE),
+        );
     }
 
     /** کلید کش نگاشت کامل تنظیمات. */

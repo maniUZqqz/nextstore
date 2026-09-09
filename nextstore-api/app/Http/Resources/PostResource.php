@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -11,6 +12,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * متن کامل عمداً اینجا نیست: فهرست ۱۲ مقاله‌ای با متن کامل، صدها
  * کیلوبایت داده‌ی بی‌استفاده جابه‌جا می‌کند. متن فقط در نمای
  * جزئیات می‌آید.
+ *
+ * @mixin Post
  */
 class PostResource extends JsonResource
 {

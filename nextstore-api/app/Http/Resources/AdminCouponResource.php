@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Coupon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -12,6 +13,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *    برنمی‌گرداند. دلیلش ساده است: فهرست کوپن‌ها یعنی فهرست کدهای
  *    تخفیف فعال. اگر جایی در فروشگاه لو برود، هر کاربری می‌تواند
  *    کدهایی را که برای کمپین خاصی ساخته شده‌اند استفاده کند.
+ *
+ * @mixin Coupon
  */
 class AdminCouponResource extends JsonResource
 {

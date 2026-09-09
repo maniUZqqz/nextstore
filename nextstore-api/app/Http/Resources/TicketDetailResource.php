@@ -2,12 +2,15 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 
 /**
  * تبدیل مدل Ticket به خروجی JSON — نمای گفتگو.
  *
  * همان فیلدهای فهرست به‌علاوه‌ی همه‌ی پیام‌ها به ترتیب زمان.
+ *
+ * @mixin Ticket
  */
 class TicketDetailResource extends TicketResource
 {

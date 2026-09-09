@@ -166,6 +166,8 @@ class AdminCustomerController extends Controller
      * ⚠️ فقط نقش مشتری. مدیران در فهرست مشتریان جایی ندارند: آمار
      *    خریدشان بی‌معناست و قاطی‌شدنشان با مشتریان، شمارش‌ها را
      *    غلط می‌کند.
+     *
+     * @return Builder<User>
      */
     private function baseQuery(): Builder
     {

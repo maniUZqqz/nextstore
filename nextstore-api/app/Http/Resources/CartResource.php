@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Cart;
 use App\Models\CartItem;
 use App\Services\Cart\CouponService;
 use Illuminate\Http\Request;
@@ -16,6 +17,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *    اگر فرانت‌اند جمع را محاسبه کند، کاربر می‌تواند با ابزار توسعه‌دهنده
  *    آن را دستکاری کند. مبلغ نهایی همیشه باید از سرور بیاید و هنگام
  *    ثبت سفارش هم دوباره سمت سرور بررسی شود.
+ *
+ * @mixin Cart
  */
 class CartResource extends JsonResource
 {

@@ -31,12 +31,14 @@ class CartItem extends Model
     }
 
     /** سبدی که این قلم به آن تعلق دارد. */
+    /** @return BelongsTo<Cart, $this> */
     public function cart(): BelongsTo
     {
         return $this->belongsTo(Cart::class);
     }
 
     /** محصول این قلم. */
+    /** @return BelongsTo<Product, $this> */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

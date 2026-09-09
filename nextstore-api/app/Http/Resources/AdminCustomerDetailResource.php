@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 
 /**
@@ -14,6 +15,8 @@ use Illuminate\Http\Request;
  *    می‌تواند صدها سفارش داشته باشد و فرستادن همه‌شان یک پاسخ چند
  *    مگابایتی می‌سازد برای صفحه‌ای که فقط ده‌تای آخر را نشان می‌دهد.
  *    فهرست کامل، جای خودش در `/admin/orders?customer=` است.
+ *
+ * @mixin User
  */
 class AdminCustomerDetailResource extends AdminCustomerResource
 {

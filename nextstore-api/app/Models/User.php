@@ -5,6 +5,9 @@ namespace App\Models;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -21,6 +24,18 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string|null $phone
  * @property UserRole $role
  * @property bool $is_active
+ *
+ * ⚠️ سه ویژگی زیر ستون جدول نیستند.
+ *
+ *    `AdminCustomerController::baseQuery()` آن‌ها را با
+ *    `withCount`, `withSum` و یک زیرکوئری به هر ردیف می‌چسباند.
+ *    اعلامشان اینجا هم به تحلیل ایستا می‌گوید که وجود دارند و
+ *    هم به خواننده می‌گوید که فقط در همان کوئری پر می‌شوند —
+ *    روی یک `User` معمولی تهی‌اند، و برای همین nullable
+ *    اعلام شده‌اند.
+ * @property-read int|null $orders_count
+ * @property-read int|null $paid_orders_sum_total
+ * @property-read string|null $last_order_at
  */
 class User extends Authenticatable
 {
@@ -72,38 +87,38 @@ class User extends Authenticatable
      * رابطه‌ها
      * ===================================================================== */
 
-    /** آدرس‌های ثبت‌شده کاربر. */
-    public function addresses()
+    /** @return HasMany<Address, $this> */
+    public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
     }
 
-    /** سفارش‌های کاربر. */
-    public function orders()
+    /** @return HasMany<Order, $this> */
+    public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
-    /** سبد خرید فعال کاربر. */
-    public function cart()
+    /** @return HasOne<Cart, $this> */
+    public function cart(): HasOne
     {
         return $this->hasOne(Cart::class);
     }
 
-    /** تیکت‌های پشتیبانی کاربر. */
-    public function tickets()
+    /** @return HasMany<Ticket, $this> */
+    public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);
     }
 
-    /** نظرات ثبت‌شده توسط کاربر — شامل در انتظار و ردشده. */
-    public function reviews()
+    /** @return HasMany<Review, $this> */
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
 
-    /** ردیف‌های علاقه‌مندی کاربر. */
-    public function wishlists()
+    /** @return HasMany<Wishlist, $this> */
+    public function wishlists(): HasMany
     {
         return $this->hasMany(Wishlist::class);
     }
@@ -116,8 +131,10 @@ class User extends Authenticatable
      *   wishlistProducts برای خواندن، چون صفحه‌ی علاقه‌مندی به
      *   خودِ محصول‌ها نیاز دارد نه ردیف‌های واسط. با belongsToMany
      *   لاراول در یک کوئری JOIN می‌زند به‌جای دو رفت‌وبرگشت.
+     *
+     * @return BelongsToMany<Product, $this>
      */
-    public function wishlistProducts()
+    public function wishlistProducts(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'wishlists')
             ->withTimestamps();

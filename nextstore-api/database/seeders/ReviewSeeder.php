@@ -82,8 +82,16 @@ class ReviewSeeder extends Seeder
      */
     private const RATING_WEIGHTS = [5 => 55, 4 => 25, 3 => 12, 2 => 5, 1 => 3];
 
+    /*
+     * ⚠️ `ReviewService` پیش‌تر اینجا تزریق می‌شد و هرگز استفاده
+     *    نمی‌شد.
+     *
+     *    سیدر امتیاز محصولات را با یک کوئری دسته‌جمعی به‌روز
+     *    می‌کند، نه با فراخوانی سرویس برای هر محصول — که برای
+     *    صدها محصول صدها کوئری می‌شد. سرویس فقط جا گرفته بود و
+     *    خواننده را به این فکر می‌انداخت که جایی صدا زده می‌شود.
+     */
     public function __construct(
-        private readonly ReviewService $reviews,
         private readonly CacheInvalidator $cache,
     ) {}
 
@@ -279,6 +287,8 @@ class ReviewSeeder extends Seeder
             ->where('is_approved', true)
             ->selectRaw('product_id, COUNT(*) as total, AVG(rating) as average')
             ->groupBy('product_id')
+            /* همان دلیل ReviewService: اینجا مدل Review لازم نیست، فقط دو عدد */
+            ->toBase()
             ->get()
             ->keyBy('product_id');
 

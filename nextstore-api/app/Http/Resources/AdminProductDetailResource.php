@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,6 +21,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *    اگر از همان Resource فروشگاه استفاده می‌کردیم، ادمین با باز کردن
  *    فرم و ذخیره‌ی آن، بی‌آنکه بفهمد ترجمه‌ی زبان دیگر را پاک می‌کرد.
  *    این یک از دست رفتن خاموش داده است — بدترین نوع باگ.
+ *
+ * @mixin Product
  */
 class AdminProductDetailResource extends JsonResource
 {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\TicketMessage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -10,6 +11,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *
  * ⚠️ ایمیل فرستنده هرگز بیرون نمی‌رود. کاربر پیام‌های پشتیبان را
  *    می‌بیند و نباید ایمیل شخصی کارمند را ببیند.
+ *
+ * @mixin TicketMessage
  */
 class TicketMessageResource extends JsonResource
 {

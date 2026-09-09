@@ -56,11 +56,13 @@ class Post extends Model
      * رابطه‌ها
      * ================================================================== */
 
+    /** @return BelongsTo<PostCategory, $this> */
     public function category(): BelongsTo
     {
         return $this->belongsTo(PostCategory::class, 'post_category_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

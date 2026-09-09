@@ -2,11 +2,14 @@
 
 namespace App\Http\Resources;
 
+use App\Models\PostCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * خروجی دسته‌بندی مقاله.
+ *
+ * @mixin PostCategory
  */
 class PostCategoryResource extends JsonResource
 {

@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\PaymentStatus;
+use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 
@@ -11,6 +12,8 @@ use Illuminate\Http\Request;
  *
  * از OrderResource ارث می‌برد و اقلام، آدرس و اطلاعات پرداخت را
  * اضافه می‌کند — چیزهایی که فقط در این صفحه لازم‌اند.
+ *
+ * @mixin Order
  */
 class OrderDetailResource extends OrderResource
 {
@@ -26,33 +29,19 @@ class OrderDetailResource extends OrderResource
         return array_merge(parent::toArray($request), [
 
             /* --- اقلام سفارش --- */
-            'items' => $this->whenLoaded('items', fn () => $this->items->map(
-                fn (OrderItem $item) => [
-                    'id' => $item->id,
-                    /* نام از عکس لحظه‌ای خرید خوانده می‌شود، نه از محصول فعلی */
-                    'name' => $item->translate('product_name', $locale),
-                    'sku' => $item->product_sku,
-                    'image' => $item->product_image,
-                    'unitPrice' => $item->unit_price,
-                    'quantity' => $item->quantity,
-                    'lineTotal' => $item->line_total,
-                    /*
-                     * نامک برای ساخت لینک به صفحه محصول.
-                     *
-                     * ⚠️ اینجا نمی‌توان از whenLoaded() استفاده کرد —
-                     *    آن متدِ JsonResource است، نه Model. فراخوانی‌اش
-                     *    روی OrderItem خطای «undefined method» می‌دهد.
-                     *
-                     *    از relationLoaded() استفاده می‌کنیم که متد مدل
-                     *    است و مثل whenLoaded از کوئری اضافه (N+1)
-                     *    جلوگیری می‌کند.
-                     */
-                    'productId' => $item->product_id,
-                    'slug' => $item->relationLoaded('product')
-                        ? $item->product?->slug
-                        : null,
-                ]
-            )->values()),
+            /*
+             * ⚠️ نگاشت اقلام در متد جداگانه است، نه بسته‌ی درون‌خطی.
+             *
+             *    نسخه‌ی اول یک closure تودرتو بود و تحلیل ایستا نمی‌توانست
+             *    نوع بازگشتی‌اش را با خودش تطبیق دهد؛ پیام خطا دو نوعِ
+             *    ظاهراً یکسان را مقابل هم می‌گذاشت چون بخش متفاوتشان در
+             *    خلاصه‌سازی حذف می‌شد — خطایی که نه خوانا بود و نه
+             *    قابل پیگیری.
+             *
+             *    متد نام‌دار یک قرارداد صریح دارد و هم برای ابزار و هم
+             *    برای خواننده روشن‌تر است.
+             */
+            'items' => $this->whenLoaded('items', fn () => $this->mapItems($locale)),
 
             /* آدرس تحویل — عکس لحظه‌ای ثبت‌شده در سفارش */
             'shippingAddress' => $this->shipping_address,
@@ -91,5 +80,42 @@ class OrderDetailResource extends OrderResource
 
             'cancelledAt' => $this->cancelled_at?->toIso8601String(),
         ]);
+    }
+
+    /**
+     * اقلام سفارش به شکل خروجی API.
+     *
+     * ⚠️ نام و نامک محصول از **عکس لحظه‌ای خرید** خوانده می‌شوند نه از
+     *    محصول فعلی: اگر فروشنده بعداً نام یا قیمت را عوض کند، فاکتور
+     *    قدیمی نباید تغییر کند.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function mapItems(string $locale): array
+    {
+        return $this->items->map(fn (OrderItem $item) => [
+            'id' => $item->id,
+            'name' => $item->translate('product_name', $locale),
+            'sku' => $item->product_sku,
+            'image' => $item->product_image,
+            'unitPrice' => $item->unit_price,
+            'quantity' => $item->quantity,
+            'lineTotal' => $item->line_total,
+            'productId' => $item->product_id,
+
+            /*
+             * نامک برای ساخت لینک به صفحه محصول.
+             *
+             * ⚠️ اینجا نمی‌توان از whenLoaded() استفاده کرد — آن متدِ
+             *    JsonResource است، نه Model. فراخوانی‌اش روی OrderItem
+             *    خطای «undefined method» می‌دهد.
+             *
+             *    از relationLoaded() استفاده می‌کنیم که متد مدل است و
+             *    مثل whenLoaded از کوئری اضافه (N+1) جلوگیری می‌کند.
+             */
+            'slug' => $item->relationLoaded('product')
+                ? $item->product?->slug
+                : null,
+        ])->values()->all();
     }
 }

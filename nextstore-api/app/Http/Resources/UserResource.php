@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -19,6 +20,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *    مقدار null دارد — پس ایمیل کاربر در پاسخ ورودِ خودش حذف می‌شد!
  *
  *    راه‌حل: پرچم صریح asOwner() که در جریان احراز هویت فعال می‌شود.
+ *
+ * @mixin User
  */
 class UserResource extends JsonResource
 {

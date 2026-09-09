@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,6 +17,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *    را فارسی باز کرده هرگز نمی‌تواند متن انگلیسی را ببیند یا
  *    ویرایش کند — و بدتر، ذخیره‌ی فرم مقدار انگلیسی را با فارسی
  *    بازنویسی می‌کند.
+ *
+ * @mixin Post
  */
 class AdminPostDetailResource extends JsonResource
 {

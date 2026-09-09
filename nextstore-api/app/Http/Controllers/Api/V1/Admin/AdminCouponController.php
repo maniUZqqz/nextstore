@@ -193,6 +193,10 @@ class AdminCouponController extends Controller
      *    اینجا هر دو شرط با هم اعمال می‌شوند تا تب و نشان یک چیز
      *    بگویند.
      */
+    /**
+     * @param  Builder<Coupon>  $query
+     * @return Builder<Coupon>
+     */
     private function scopeActive(Builder $query): Builder
     {
         return $query->usable()

@@ -2,11 +2,14 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * تبدیل مدل Address به خروجی JSON.
+ *
+ * @mixin Address
  */
 class AddressResource extends JsonResource
 {

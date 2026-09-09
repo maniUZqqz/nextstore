@@ -244,14 +244,35 @@ pnpm build && pnpm start   # تولید
 
 ## 🧪 تست
 
+### بک‌اند
+
 ```bash
 cd nextstore-api
-../tools/php/php.exe artisan test        # ۱۴۰ تست Pest — ۲۸۶ assertion
-../tools/php/php.exe vendor/bin/pint    # قالب‌بندی کد
+../tools/php/php.exe artisan test                      # ۲۰۱ تست Pest
+../tools/php/php.exe vendor/bin/pint                   # قالب‌بندی کد
+../tools/php/php.exe ../tools/composer.phar analyse    # تحلیل ایستا (PHPStan)
 ```
 
-تست‌ها روی SQLite **در حافظه** اجرا می‌شوند (`phpunit.xml`)، پس داده‌ی دمو
-هرگز دست نمی‌خورد. کل سوئیت حدود ۱۶ ثانیه طول می‌کشد.
+⚠️ تحلیل ایستا را با اسکریپت composer اجرا کنید نه مستقیم: سقف حافظه‌ی
+پیش‌فرض PHP برای این پروژه کم است و خطایش («Child process error») شبیه
+باگ خود ابزار به نظر می‌رسد نه کمبود حافظه.
+
+### فرانت‌اند
+
+```bash
+cd nextstore-web
+pnpm typecheck                 # tsc
+pnpm lint                      # eslint
+pnpm test:e2e                  # هر ۲۲ سوئیت سرتاسری، پشت سر هم
+pnpm test:e2e checkout         # فقط آن‌هایی که «checkout» در نامشان است
+pnpm shots                     # عکس‌برداری برای بازبینی چشمی
+```
+
+⚠️ تست‌های سرتاسری به **سرور در حال اجرا** نیاز دارند (`run.bat`). سریال
+اجرا می‌شوند چون روی یک دیتابیس مشترک کار می‌کنند.
+
+تست‌های Pest روی SQLite **در حافظه** اجرا می‌شوند (`phpunit.xml`)، پس
+داده‌ی دمو هرگز دست نمی‌خورد. کل سوئیت حدود ۲۵ ثانیه طول می‌کشد.
 
 | پوشه | چه چیزی را می‌آزماید |
 |---|---|
@@ -263,9 +284,10 @@ cd nextstore-api
 | `tests/Feature/Support` | چرخه‌ی تیکت از دو سمت، صف پشتیبانی |
 | `tests/Feature/Auth` | ثبت‌نام، هش رمز، حساب مسدود، ابطال توکن |
 | `tests/Feature/Admin` | کنترل دسترسی، IDOR، نشت هش رمز و ایمیل، فهرست سفید تنظیمات |
+| `tests/Feature/Shop` | فهرست سفید تنظیمات، یکی‌بودن نرخ ارسال با سبد |
 
-تست‌های سرتاسری مرورگری جدا هستند و در `nextstore-web/scripts/e2e-*.mjs` قرار دارند
-(۱۸ سوئیت) — به سرور در حال اجرا نیاز دارند.
+تست‌های سرتاسری مرورگری جدا هستند و در `nextstore-web/scripts/e2e-*.mjs`
+قرار دارند (۲۲ سوئیت).
 
 ---
 

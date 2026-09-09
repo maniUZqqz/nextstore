@@ -2,10 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 /**
  * خروجی مقاله در نمای جزئیات — همان فیلدهای فهرست، به‌علاوه متن کامل.
+ *
+ * @mixin Post
  */
 class PostDetailResource extends PostResource
 {

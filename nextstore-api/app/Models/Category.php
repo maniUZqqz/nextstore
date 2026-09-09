@@ -57,12 +57,14 @@ class Category extends Model
      * ===================================================================== */
 
     /** دسته والد — برای دسته‌های سطح اول null است. */
+    /** @return BelongsTo<Category, $this> */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
     /** زیردسته‌های مستقیم (یک سطح پایین‌تر). */
+    /** @return HasMany<Category, $this> */
     public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order');
@@ -78,6 +80,8 @@ class Category extends Model
      *    نام آن باید در Resource هم دقیقاً همین باشد، وگرنه
      *    `whenLoaded('children')` مقدار خالی برمی‌گرداند —
      *    باگی که به‌سادگی از چشم پنهان می‌ماند.
+     *
+     * @return HasMany<Category, $this>
      */
     public function childrenRecursive(): HasMany
     {
@@ -87,6 +91,7 @@ class Category extends Model
     }
 
     /** محصولات مستقیمِ این دسته. */
+    /** @return HasMany<Product, $this> */
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);

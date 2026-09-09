@@ -47,24 +47,31 @@ class Ticket extends Model
      * ===================================================================== */
 
     /** صاحب تیکت. */
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     /** سفارش مرتبط، در صورت وجود. */
+    /** @return BelongsTo<Order, $this> */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
     /** پیام‌های گفتگو به ترتیب زمان. */
+    /** @return HasMany<TicketMessage, $this> */
     public function messages(): HasMany
     {
         return $this->hasMany(TicketMessage::class)->oldest();
     }
 
-    /** آخرین پیام — برای پیش‌نمایش در فهرست. */
+    /**
+     * آخرین پیام — برای پیش‌نمایش در فهرست.
+     *
+     * @return HasMany<TicketMessage, $this>
+     */
     public function latestMessage(): HasMany
     {
         return $this->hasMany(TicketMessage::class)->latest();

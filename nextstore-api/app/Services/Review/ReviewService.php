@@ -180,6 +180,17 @@ class ReviewService
             ->where('product_id', $product->id)
             ->approved()
             ->selectRaw('COUNT(*) as total, COALESCE(AVG(rating), 0) as average')
+            /*
+             * ⚠️ `toBase()` پیش از `first()`.
+             *
+             *    بدون آن، لاراول یک مدل `Review` می‌سازد که
+             *    هیچ‌کدام از ستون‌هایش را ندارد و فقط دو نام
+             *    مستعار کوئری رویش نشسته است. هم گمراه‌کننده
+             *    است (شیئی که Review نیست ولی Review نامیده
+             *    می‌شود) و هم هزینه‌ی بی‌دلیل ساخت مدل و رویداد
+             *    دارد. حالا یک `stdClass` ساده برمی‌گردد.
+             */
+            ->toBase()
             ->first();
 
         $product->newQuery()

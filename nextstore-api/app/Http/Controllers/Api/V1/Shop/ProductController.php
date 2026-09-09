@@ -70,8 +70,12 @@ class ProductController extends Controller
          * از increment استفاده می‌کنیم نه خواندن-و-نوشتن، چون اتمیک است
          * و در درخواست‌های همزمان شمارش از دست نمی‌رود.
          * timestamps را هم دست نمی‌زند تا updated_at بی‌دلیل تغییر نکند.
+         *
+         * ⚠️ `withoutTimestamps` و نه `incrementQuietly`: دومی در
+         *    لاراول protected است و فقط از راه `Model::__call` کار
+         *    می‌کند — قراردادی که هیچ تحلیل ایستایی نمی‌تواند تأییدش کند.
          */
-        $product->incrementQuietly('views_count');
+        Product::withoutTimestamps(fn () => $product->increment('views_count'));
 
         return new ProductDetailResource(
             $product->load(['images', 'category.parent', 'brand'])

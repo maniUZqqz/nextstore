@@ -48,24 +48,28 @@ class Review extends Model
      * ===================================================================== */
 
     /** نویسنده نظر. */
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     /** محصولی که درباره‌اش نظر داده شده. */
+    /** @return BelongsTo<Product, $this> */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
     /** سفارشی که خرید تأییدشده را اثبات می‌کند. */
+    /** @return BelongsTo<Order, $this> */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
     /** آرای «مفید بود». */
+    /** @return HasMany<ReviewVote, $this> */
     public function votes(): HasMany
     {
         return $this->hasMany(ReviewVote::class);

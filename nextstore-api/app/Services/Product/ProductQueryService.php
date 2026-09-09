@@ -55,7 +55,7 @@ class ProductQueryService
      * ساخت و اجرای کوئری محصولات با فیلترهای درخواستی.
      *
      * @param  array<string, mixed>  $filters  فیلترهای خام از Query String
-     * @return LengthAwarePaginator<Product>
+     * @return LengthAwarePaginator<int, Product>
      */
     public function paginate(array $filters): LengthAwarePaginator
     {
@@ -95,6 +95,7 @@ class ProductQueryService
      * «لپ‌تاپ» هم باید نمایش داده شوند.
      *
      * @param  array<string, mixed>  $filters
+     * @param  Builder<Product>  $query
      */
     private function applyCategoryFilter(Builder $query, array $filters): void
     {
@@ -118,6 +119,7 @@ class ProductQueryService
      * ورودی می‌تواند تک‌مقداری یا آرایه باشد: ?brand=apple&brand=samsung
      *
      * @param  array<string, mixed>  $filters
+     * @param  Builder<Product>  $query
      */
     private function applyBrandFilter(Builder $query, array $filters): void
     {
@@ -137,6 +139,7 @@ class ProductQueryService
      * تخفیف‌خورده‌ای که در بازه‌ی کاربر است از نتایج حذف می‌شود.
      *
      * @param  array<string, mixed>  $filters
+     * @param  Builder<Product>  $query
      */
     private function applyPriceFilter(Builder $query, array $filters): void
     {
@@ -156,6 +159,7 @@ class ProductQueryService
      * فیلتر «فقط کالاهای موجود».
      *
      * @param  array<string, mixed>  $filters
+     * @param  Builder<Product>  $query
      */
     private function applyAvailabilityFilter(Builder $query, array $filters): void
     {
@@ -168,6 +172,7 @@ class ProductQueryService
      * فیلتر «فقط کالاهای تخفیف‌دار».
      *
      * @param  array<string, mixed>  $filters
+     * @param  Builder<Product>  $query
      */
     private function applySaleFilter(Builder $query, array $filters): void
     {
@@ -180,6 +185,7 @@ class ProductQueryService
      * فیلتر حداقل امتیاز (مثلاً «۴ ستاره و بالاتر»).
      *
      * @param  array<string, mixed>  $filters
+     * @param  Builder<Product>  $query
      */
     private function applyRatingFilter(Builder $query, array $filters): void
     {
@@ -209,6 +215,7 @@ class ProductQueryService
      *    Meilisearch یا Laravel Scout جایگزین شود.
      *
      * @param  array<string, mixed>  $filters
+     * @param  Builder<Product>  $query
      */
     private function applySearchFilter(Builder $query, array $filters): void
     {
@@ -239,6 +246,7 @@ class ProductQueryService
      * اعمال مرتب‌سازی امن بر اساس نگاشت سفید.
      *
      * @param  array<string, mixed>  $filters
+     * @param  Builder<Product>  $query
      */
     private function applySorting(Builder $query, array $filters): void
     {

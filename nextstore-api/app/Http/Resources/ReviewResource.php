@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -11,6 +12,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * ⚠️ حریم خصوصی: ایمیل و شماره‌ی نویسنده هرگز بیرون نمی‌رود.
  *    نظر روی صفحه‌ی محصول برای همه قابل دیدن است، پس هر فیلدی که
  *    اینجا اضافه شود عملاً عمومی است.
+ *
+ * @mixin Review
  */
 class ReviewResource extends JsonResource
 {
