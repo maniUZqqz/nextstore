@@ -248,7 +248,7 @@ pnpm build && pnpm start   # تولید
 
 ```bash
 cd nextstore-api
-../tools/php/php.exe artisan test                      # ۲۰۱ تست Pest
+../tools/php/php.exe artisan test                      # ۲۲۵ تست Pest
 ../tools/php/php.exe vendor/bin/pint                   # قالب‌بندی کد
 ../tools/php/php.exe ../tools/composer.phar analyse    # تحلیل ایستا (PHPStan)
 ../tools/php/php.exe artisan docs:api                  # ساخت مستندات API
@@ -291,17 +291,17 @@ pnpm shots                     # عکس‌برداری برای بازبینی �
 اجرا می‌شوند چون روی یک دیتابیس مشترک کار می‌کنند.
 
 تست‌های Pest روی SQLite **در حافظه** اجرا می‌شوند (`phpunit.xml`)، پس
-داده‌ی دمو هرگز دست نمی‌خورد. کل سوئیت حدود ۲۵ ثانیه طول می‌کشد.
+داده‌ی دمو هرگز دست نمی‌خورد. کل سوئیت حدود ۳۵ ثانیه طول می‌کشد.
 
 | پوشه | چه چیزی را می‌آزماید |
 |---|---|
 | `tests/Unit` | محاسبه‌ی تخفیف — سقف، گِردکردن صحیح، مبلغ منفی |
 | `tests/Feature/Order` | ثبت سفارش: دستکاری قیمت، برگشت تراکنش، کسر موجودی، کوپن |
 | `tests/Feature/Cart` | عملیات سبد، ادغام سبد مهمان، هر شاخه‌ی رد کد تخفیف |
-| `tests/Feature/Catalog` | فیلتر، جستجوی بین‌زبانی، پنهان‌ماندن پیش‌نویس‌ها |
+| `tests/Feature/Catalog` | فیلتر، جستجوی بین‌زبانی، پنهان‌ماندن پیش‌نویس‌ها، بنرها |
 | `tests/Feature/Review` | صف تعدیل، بازمحاسبه‌ی امتیاز، رأی مفید |
-| `tests/Feature/Support` | چرخه‌ی تیکت از دو سمت، صف پشتیبانی |
-| `tests/Feature/Auth` | ثبت‌نام، هش رمز، حساب مسدود، ابطال توکن |
+| `tests/Feature/Support` | چرخه‌ی تیکت، فرم تماس، اعلان‌ها، ایمیل‌های صف‌شده |
+| `tests/Feature/Auth` | ثبت‌نام، هش رمز، حساب مسدود، ابطال توکن، بازیابی رمز |
 | `tests/Feature/Admin` | کنترل دسترسی، IDOR، نشت هش رمز و ایمیل، فهرست سفید تنظیمات |
 | `tests/Feature/Shop` | فهرست سفید تنظیمات، یکی‌بودن نرخ ارسال با سبد |
 
