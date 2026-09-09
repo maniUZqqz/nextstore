@@ -55,14 +55,43 @@ function findChromium() {
 }
 
 async function adminToken() {
-  const response = await fetch(`${API}/api/v1/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ email: 'admin@demo.dev', password: 'password' }),
-  })
-  const payload = await response.json()
-  if (!payload?.data?.token) throw new Error('ورود مدیر ناموفق بود')
-  return payload.data.token
+  /*
+   * ⚠️ ۴۲۹ با «رمز اشتباه» یکی گرفته نمی‌شود.
+   *
+   *    مسیر ورود سقف ۵ تلاش در دقیقه روی هر ترکیب ایمیل و IP دارد و
+   *    **۱۴ سوئیت** از همان حساب `admin@demo.dev` استفاده می‌کنند.
+   *    وقتی `pnpm test:e2e` همه را پشت هم اجرا می‌کند، سوئیت‌های میانی
+   *    به آن سقف می‌خورند.
+   *
+   *    نسخه‌ی اول هر پاسخ غیر ۲۰۰ را «ورود ناموفق» می‌خواند — پیامی که
+   *    شبیه رمز اشتباه یا حساب حذف‌شده به نظر می‌رسد. اجرای تکیِ همان
+   *    سوئیت بلافاصله سبز می‌شد و آدم دنبال باگی می‌گشت که وجود نداشت.
+   *
+   * ⚠️ سقف کم نشد و نباید بشود: ۵ تلاش در دقیقه محافظ واقعی در برابر
+   *    حدس رمز است. تستی که برای راحتی خودش امنیت را ضعیف کند، همان
+   *    چیزی را می‌شکند که قرار است بسنجد. راه درست این است که صبر کند.
+   */
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const response = await fetch(`${API}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ email: 'admin@demo.dev', password: 'password' }),
+    })
+
+    if (response.status === 429) {
+      console.log('  (ورود به سقف نرخ خورد — صبر می‌کنیم)')
+      await new Promise((resolve) => setTimeout(resolve, 12_000))
+      continue
+    }
+
+    const payload = await response.json()
+
+    if (payload?.data?.token) return payload.data.token
+
+    throw new Error(`ورود مدیر ناموفق بود — کد ${response.status}`)
+  }
+
+  throw new Error('ورود مدیر پس از چند تلاش هم به سقف نرخ خورد')
 }
 
 const token = await adminToken()
