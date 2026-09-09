@@ -21,6 +21,7 @@ import { ShieldCheck, Store, LogOut } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
+import { NotificationBell } from '@/components/layout/NotificationBell'
 import { useAuth } from '@/hooks/useAuth'
 
 export function AdminHeader() {
@@ -60,6 +61,19 @@ export function AdminHeader() {
           <Store className="size-4" aria-hidden="true" />
           <span className="hidden sm:inline">{t('backToShop')}</span>
         </Link>
+
+        {/*
+          ⚠️ مدیر هم کاربر است و اعلان می‌گیرد.
+
+             نسخه‌ی اول زنگوله را فقط در هدر فروشگاه گذاشت. ولی پنل
+             هدر جدای خودش را دارد، پس مدیری که تمام روز در پنل کار
+             می‌کند هیچ‌وقت اعلان‌هایش را نمی‌دید — پاسخ تیکتی که
+             خودش مشتری‌اش بوده، یا تأیید نظرش.
+
+             لینک «دیدن همه» به بخش حساب کاربری می‌رود، بیرون از پنل؛
+             این درست است چون اعلان‌ها شخصی‌اند نه مدیریتی.
+        */}
+        <NotificationBell />
 
         <LocaleSwitcher />
         <ThemeToggle />

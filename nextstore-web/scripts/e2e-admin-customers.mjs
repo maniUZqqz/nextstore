@@ -98,6 +98,37 @@ console.log('counts from API:', JSON.stringify(counts))
 const topBuyer = (await (await call('/admin/customers?sort=spent&per_page=1')).json()).data[0]
 console.log('customer under test:', topBuyer.id, topBuyer.name)
 
+/**
+ * بازگرداندن هر مشتری‌ای که اجرای قبلی غیرفعال گذاشته.
+ *
+ * ⚠️ بدون این، یک اجرای شکسته تست را **برای همیشه** خراب می‌کند.
+ *
+ *    بخش ۶ روی دکمه‌ی «غیرفعال کردن» کلیک می‌کند. متن آن دکمه شرطی
+ *    است: اگر مشتری از قبل غیرفعال باشد، دکمه «فعال‌سازی حساب»
+ *    می‌گوید و انتظار برای متن اول با TimeoutError می‌میرد — خطایی که
+ *    هیچ اشاره‌ای به علت واقعی ندارد.
+ *
+ *    دقیقاً همین اتفاق افتاد: یک اجرا وسط کار شکست، «رضا کریمی»
+ *    غیرفعال ماند، و از آن به بعد هر اجرا با تایم‌اوت می‌مرد.
+ */
+async function restoreDisabledCustomers() {
+  const response = await call('/admin/customers?status=inactive&per_page=100')
+  const rows = (await response.json()).data ?? []
+
+  for (const customer of rows) {
+    await call(`/admin/customers/${customer.id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_active: true }),
+    })
+  }
+
+  if (rows.length > 0) {
+    console.log(`  (${rows.length} مشتری بازمانده‌ی اجرای قبلی فعال شد)`)
+  }
+}
+
+await restoreDisabledCustomers()
+
 mkdirSync(OUT, { recursive: true })
 
 const browser = await chromium.launch({ executablePath: findChromium() })

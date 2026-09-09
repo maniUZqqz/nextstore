@@ -171,7 +171,18 @@ console.log('\n--- 4. save ---')
 let createdId = null
 {
   await page.click('button[type="submit"]')
-  await page.waitForTimeout(3000)
+
+  /*
+   * منتظر تغییر نشانی می‌مانیم، نه یک مکث ثابت.
+   *
+   * نسخه‌ی اول سه ثانیه صبر می‌کرد. روی ماشینی که همزمان کار دیگری
+   * می‌کند — یا وقتی دیسک پر است و نکست کند شده — گاهی کافی نبود و
+   * تست شکست می‌خورد؛ شکستی که با اجرای دوباره سبز می‌شد و آدم را به
+   * دنبال باگی می‌فرستاد که وجود نداشت.
+   */
+  await page
+    .waitForURL((url) => !url.pathname.includes('/new'), { timeout: 20000 })
+    .catch(() => {})
 
   check('redirected to list', page.url().includes('/admin/posts') && !page.url().includes('/new'),
         new URL(page.url()).pathname)
@@ -210,7 +221,14 @@ console.log('\n--- 6. edit form loads both languages ---')
   /* ویرایش فقط فارسی — انگلیسی نباید پاک شود */
   await page.fill('#title-fa', 'مقاله تست ویرایش‌شده')
   await page.click('button[type="submit"]')
-  await page.waitForTimeout(3000)
+
+  /* همان دلیل بالا: فرم ویرایش هم پس از موفقیت به فهرست می‌رود */
+  await page
+    .waitForURL((url) => !/\/posts\/\d+/.test(url.pathname), { timeout: 20000 })
+    .catch(() => {})
+
+  /* مهلت کوتاه تا نوشتن در دیتابیس تمام شود */
+  await page.waitForTimeout(800)
 
   const detail = await (await call(token, '/admin/posts/' + createdId)).json()
   check('persian updated', detail.data?.title?.fa === 'مقاله تست ویرایش‌شده', detail.data?.title?.fa)
