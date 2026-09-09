@@ -498,6 +498,7 @@
       "brands": "Brands",
       "reviews": "Reviews",
       "tickets": "Support",
+      "messages": "Messages",
       "coupons": "Coupons"
     },
     "dashboard": {
@@ -950,6 +951,26 @@
       "save": "Save settings",
       "saved": "Settings saved.",
       "unsaved": "You have unsaved changes"
+    },
+    "contact": {
+      "title": "Contact messages",
+      "subtitle": "Messages received through the contact form.",
+      "status": {
+        "unread": "Unread",
+        "read": "Read",
+        "all": "All"
+      },
+      "searchPlaceholder": "Search name, email or subject...",
+      "empty": "No messages yet.",
+      "emptyUnread": "You have read every message.",
+      "emptySearch": "No message matches that search.",
+      "registered": "Customer",
+      "sentAt": "Sent",
+      "ip": "IP address",
+      "account": "Account",
+      "reply": "Reply by email",
+      "delete": "Delete",
+      "deleteConfirm": "This message will be permanently deleted. Are you sure?"
     }
   },
   "categories": {
@@ -1001,9 +1022,10 @@
   "contact": {
     "title": "Contact us",
     "subtitle": "A question, a suggestion or a problem? Write to us.",
-    "demoNotice": "This is a portfolio project and there is no endpoint to receive messages yet, so the form below does not send anything. Please use the channels beside it for real contact.",
-    "submittedNotice": "The form was valid — but as stated, no message was sent.",
     "submit": "Send message",
+    "sentNotice": "Your message has been received.",
+    "tooMany": "Too many messages in a row. Wait a minute and try again.",
+    "failed": "The message could not be sent. Check your connection, or use one of the channels listed alongside.",
     "channels": "Ways to reach us",
     "phone": "Support phone",
     "email": "Email",
@@ -1011,6 +1033,7 @@
     "hours": "Support hours",
     "hoursValue": "Saturday to Wednesday, 9am to 5pm",
     "addressValue": "Valiasr St, above Vanak Square, Tehran",
+    "emailValue": "support@nextstore.dev",
     "fields": {
       "name": "Full name",
       "email": "Email",

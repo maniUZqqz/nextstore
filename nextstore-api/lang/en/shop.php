@@ -153,4 +153,16 @@ return [
 
     /* --- تنظیمات --- */
     'settings_saved' => 'Settings saved.',
+
+    /* --- تماس با ما --- */
+    'contact_name_required' => 'Please enter your name.',
+    'contact_name_short' => 'Your name must be at least 3 characters.',
+    'contact_email_required' => 'Please enter your email.',
+    'contact_email_invalid' => 'That email is not valid - without it we cannot reply.',
+    'contact_subject_required' => 'Please enter a subject.',
+    'contact_subject_short' => 'The subject must be at least 3 characters.',
+    'contact_message_required' => 'Please enter your message.',
+    'contact_message_short' => 'Your message must be at least :min characters.',
+    'contact_sent' => 'Your message has been received. We will reply soon.',
+    'contact_deleted' => 'Message deleted.',
 ];

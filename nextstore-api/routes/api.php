@@ -16,6 +16,7 @@
 
 use App\Http\Controllers\Api\V1\Admin\AdminBrandController;
 use App\Http\Controllers\Api\V1\Admin\AdminCategoryController;
+use App\Http\Controllers\Api\V1\Admin\AdminContactController;
 use App\Http\Controllers\Api\V1\Admin\AdminCouponController;
 use App\Http\Controllers\Api\V1\Admin\AdminCustomerController;
 use App\Http\Controllers\Api\V1\Admin\AdminOrderController;
@@ -34,6 +35,7 @@ use App\Http\Controllers\Api\V1\Customer\WishlistController;
 use App\Http\Controllers\Api\V1\Shop\BlogController;
 use App\Http\Controllers\Api\V1\Shop\CartController;
 use App\Http\Controllers\Api\V1\Shop\CatalogController;
+use App\Http\Controllers\Api\V1\Shop\ContactController;
 use App\Http\Controllers\Api\V1\Shop\PaymentController;
 use App\Http\Controllers\Api\V1\Shop\ProductController;
 use App\Http\Controllers\Api\V1\Shop\ReviewController;
@@ -125,6 +127,21 @@ Route::prefix('v1')->group(function () {
      * فوتر و نوار بالای هدر از این تغذیه می‌شوند، پس بدون احراز هویت است.
      */
     Route::get('settings', [SettingsController::class, 'index'])->name('api.settings');
+
+    /*
+     * فرم «تماس با ما».
+     *
+     * ⚠️ بدون احراز هویت — مهمان هم باید بتواند بپرسد. اجبار به
+     *    ثبت‌نام برای پرسیدن یک سؤال، همان تماسی را از بین می‌برد که
+     *    صفحه برای آن ساخته شده.
+     *
+     * ⚠️ throttle مخصوص خودش دارد، نه `api` عمومی: این تنها مسیر
+     *    عمومی است که در دیتابیس **می‌نویسد**، پس سقف ۱۲۰ درخواست در
+     *    دقیقه‌ی گروه اصلی برایش بی‌معنا بالاست.
+     */
+    Route::post('contact', [ContactController::class, 'store'])
+        ->middleware('throttle:contact')
+        ->name('api.contact.store');
 
     /** بررسی سلامت سرویس — برای مانیتورینگ */
     Route::get('health', fn () => response()->json([
@@ -280,6 +297,11 @@ Route::prefix('v1')->group(function () {
         /* --- تنظیمات فروشگاه --- */
         Route::get('settings', [AdminSettingController::class, 'index'])->name('api.admin.settings.index');
         Route::put('settings', [AdminSettingController::class, 'update'])->name('api.admin.settings.update');
+
+        /* --- صندوق پیام‌های تماس --- */
+        Route::get('contact-messages', [AdminContactController::class, 'index'])->name('api.admin.contact.index');
+        Route::get('contact-messages/{contactMessage}', [AdminContactController::class, 'show'])->name('api.admin.contact.show');
+        Route::delete('contact-messages/{contactMessage}', [AdminContactController::class, 'destroy'])->name('api.admin.contact.destroy');
 
         /* --- کدهای تخفیف --- */
         /*

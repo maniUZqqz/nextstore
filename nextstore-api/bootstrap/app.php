@@ -16,6 +16,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -86,6 +87,43 @@ return Application::configure(basePath: dirname(__DIR__))
                     'available' => $e->available,
                     'requested' => $e->requested,
                 ],
+            ], 422);
+        });
+
+        /*
+         * خطای اعتبارسنجی فرم.
+         *
+         * ⚠️ بدون این هندلر، لاراول پیام را با متد `summarize` می‌سازد و
+         *    نتیجه‌اش در رابط فارسی چنین چیزی بود:
+         *
+         *        «نام باید دست‌کم ۳ نویسه باشد. (and 3 more errors)»
+         *
+         *    آن پسوند انگلیسی محلی‌سازی‌شدنی نیست — در کد خود فریم‌ورک
+         *    hard-code شده — و روی **هر فرم پروژه** ظاهر می‌شد، نه فقط
+         *    یکی.
+         *
+         * ⚠️ یک خطا پیام خودش را می‌گیرد و چند خطا پیام عمومی.
+         *
+         *    وقتی فقط یک فیلد ایراد دارد، «ایمیل معتبر نیست» دقیق‌تر از
+         *    هر جمله‌ی کلی است. وقتی چهار فیلد ایراد دارند، خواندن یکی
+         *    از آن‌ها در toast گمراه‌کننده است چون کاربر فکر می‌کند
+         *    همان یکی مشکل دارد — جزئیات هر فیلد همین حالا زیر خودش
+         *    نشسته و `errors` هم دست‌نخورده فرستاده می‌شود.
+         */
+        $exceptions->render(function (ValidationException $e, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
+            $errors = $e->errors();
+            $first = collect($errors)->flatten();
+
+            return response()->json([
+                'message' => $first->count() === 1
+                    ? $first->first()
+                    : __('errors.validation_failed'),
+                'error' => ['code' => 'VALIDATION_FAILED'],
+                'errors' => $errors,
             ], 422);
         });
 

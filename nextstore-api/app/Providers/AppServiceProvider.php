@@ -70,6 +70,23 @@ class AppServiceProvider extends ServiceProvider
          * محدودیت جستجو.
          * جستجو کوئری سنگینی است، پس سهم کمتری می‌گیرد.
          */
+        /*
+         * فرم تماس — سقف سخت‌گیرانه روی IP.
+         *
+         * ⚠️ ۳ در دقیقه و ۲۰ در ساعت، هر دو با هم.
+         *
+         *    فقط سقف دقیقه‌ای، ربات را متوقف نمی‌کند: کافی است بین هر
+         *    ارسال ۲۱ ثانیه صبر کند تا شبانه هزار پیام بریزد. سقف
+         *    ساعتی همان حلقه را می‌بندد، و آدم واقعی هرگز به هیچ‌کدام
+         *    نمی‌خورد — کسی در یک ساعت بیست بار فرم تماس پر نمی‌کند.
+         */
+        RateLimiter::for('contact', function (Request $request) {
+            return [
+                Limit::perMinute(3)->by('contact:'.$request->ip()),
+                Limit::perHour(20)->by('contact:'.$request->ip()),
+            ];
+        });
+
         RateLimiter::for('search', function (Request $request) {
             return Limit::perMinute(30)->by($request->ip());
         });

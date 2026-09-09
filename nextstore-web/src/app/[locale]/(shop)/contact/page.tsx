@@ -14,6 +14,8 @@ import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { Phone, Mail, MapPin, Clock } from 'lucide-react'
 import { Breadcrumb } from '@/components/common/Breadcrumb'
 import { ContactForm } from '@/components/common/ContactForm'
+import { getSiteSettings } from '@/lib/api/settings'
+import { toAsciiDigits } from '@/lib/utils/format'
 
 export async function generateMetadata({
   params,
@@ -38,18 +40,64 @@ export default async function ContactPage({
   const tNav = await getTranslations('nav')
   const tTopbar = await getTranslations('topbar')
 
+  /*
+   * اطلاعات تماس از دیتابیس می‌آید، نه از فایل ترجمه.
+   *
+   * ⚠️ پیش‌تر ایمیل همین‌جا هاردکد بود و تلفن از فضای‌نام topbar خوانده
+   *    می‌شد — در حالی که هدر و فوتر همین اطلاعات را از `settings`
+   *    می‌گیرند. نتیجه‌اش این بود که ادمین شماره را در پنل عوض می‌کرد،
+   *    در فوتر عوض می‌شد و در **همین صفحه** — که کاربر دقیقاً برای
+   *    پیدا کردن شماره بازش می‌کند — عدد قدیمی می‌ماند.
+   *
+   *    مقدار جایگزین از فایل ترجمه حفظ شده تا اگر API در دسترس نبود یا
+   *    ادمین کلیدی را خالی گذاشته بود، ستون کناری خالی نماند.
+   */
+  const settings = await getSiteSettings(locale)
+
+  const phone = settings.contactPhone ?? tTopbar('phone')
+  const email = settings.contactEmail ?? t('emailValue')
+
   /**
    * راه‌های ارتباطی.
    *
-   * شماره تلفن از فضای‌نام topbar خوانده می‌شود تا با نواری که بالای
-   * همه‌ی صفحات است یکی بماند؛ دو شماره‌ی متفاوت روی یک سایت، اعتماد
-   * را از بین می‌برد.
+   * ⚠️ تلفن و ایمیل لینک‌اند نه متن. روی موبایل — که بیشتر بازدید از
+   *    آنجاست — کاربر شماره را با یک لمس می‌گیرد، به‌جای اینکه حفظش
+   *    کند و به برنامه‌ی تلفن برود.
    */
-  const channels = [
-    { key: 'phone', Icon: Phone, label: t('phone'), value: tTopbar('phone'), ltr: true },
-    { key: 'email', Icon: Mail, label: t('email'), value: 'support@nextstore.dev', ltr: true },
-    { key: 'address', Icon: MapPin, label: t('address'), value: t('addressValue') },
-    { key: 'hours', Icon: Clock, label: t('hours'), value: t('hoursValue') },
+  const channels: {
+    key: string
+    Icon: typeof Phone
+    label: string
+    value: string
+    ltr?: boolean
+    href?: string
+  }[] = [
+    {
+      key: 'phone',
+      Icon: Phone,
+      label: t('phone'),
+      value: phone,
+      ltr: true,
+      /*
+       * ⚠️ ارقام فارسی در `tel:` کار نمی‌کنند — سیستم‌عامل فقط ASCII
+       *    می‌فهمد. پیش از ساختن لینک به لاتین برگردانده می‌شوند، ولی
+       *    متنی که کاربر می‌بیند دست‌نخورده می‌ماند.
+       */
+      href: 'tel:' + toAsciiDigits(phone).replace(/[^\d+]/g, ''),
+    },
+    { key: 'email', Icon: Mail, label: t('email'), value: email, ltr: true, href: 'mailto:' + email },
+    {
+      key: 'address',
+      Icon: MapPin,
+      label: t('address'),
+      value: settings.contactAddress ?? t('addressValue'),
+    },
+    {
+      key: 'hours',
+      Icon: Clock,
+      label: t('hours'),
+      value: settings.supportHours ?? t('hoursValue'),
+    },
   ]
 
   return (
@@ -77,7 +125,7 @@ export default async function ContactPage({
           <h2 className="text-sm font-bold text-foreground">{t('channels')}</h2>
 
           <ul className="mt-4 flex flex-col gap-4">
-            {channels.map(({ key, Icon, label, value, ltr }) => (
+            {channels.map(({ key, Icon, label, value, ltr, href }) => (
               <li key={key} className="flex items-start gap-3">
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
                   <Icon className="size-4" aria-hidden="true" />
@@ -94,7 +142,13 @@ export default async function ContactPage({
                     dir={ltr ? 'ltr' : undefined}
                     className={`mt-0.5 text-sm leading-6 text-foreground ${ltr ? 'text-start' : ''}`}
                   >
-                    {value}
+                    {href ? (
+                      <a href={href} className="transition-colors hover:text-primary">
+                        {value}
+                      </a>
+                    ) : (
+                      value
+                    )}
                   </p>
                 </div>
               </li>

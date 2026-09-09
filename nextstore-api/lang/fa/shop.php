@@ -153,4 +153,16 @@ return [
 
     /* --- تنظیمات --- */
     'settings_saved' => 'تنظیمات ذخیره شد.',
+
+    /* --- تماس با ما --- */
+    'contact_name_required' => 'نام را وارد کنید.',
+    'contact_name_short' => 'نام باید دست‌کم ۳ نویسه باشد.',
+    'contact_email_required' => 'ایمیل را وارد کنید.',
+    'contact_email_invalid' => 'ایمیل معتبر نیست — بدون آن نمی‌توانیم پاسخ بدهیم.',
+    'contact_subject_required' => 'موضوع را وارد کنید.',
+    'contact_subject_short' => 'موضوع باید دست‌کم ۳ نویسه باشد.',
+    'contact_message_required' => 'متن پیام را وارد کنید.',
+    'contact_message_short' => 'متن پیام باید دست‌کم :min نویسه باشد.',
+    'contact_sent' => 'پیام شما ثبت شد. به‌زودی پاسخ می‌دهیم.',
+    'contact_deleted' => 'پیام حذف شد.',
 ];

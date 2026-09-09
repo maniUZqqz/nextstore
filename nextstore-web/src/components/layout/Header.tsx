@@ -13,6 +13,7 @@
 
 import { getTranslations } from 'next-intl/server'
 import { getSiteSettings } from '@/lib/api/settings'
+import { toAsciiDigits } from '@/lib/utils/format'
 import { Phone, Truck, PackageSearch, Heart } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { getCategories } from '@/lib/api/catalog'
@@ -50,6 +51,9 @@ export async function Header({ locale }: { locale: string }) {
    */
   const settings = await getSiteSettings(locale)
 
+  /* یک منبع برای شماره — هم متن دیده‌شده و هم مقصد لینک از همین می‌آید */
+  const phone = settings.contactPhone ?? tTop('phone')
+
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md">
       {/* ==========================================================
@@ -62,13 +66,26 @@ export async function Header({ locale }: { locale: string }) {
             {/*
               تلفن یک لینک `tel:` است، نه متن ساده — روی موبایل با یک
               لمس تماس گرفته می‌شود و روی دسکتاپ هم قابل کپی می‌ماند.
+
+              ⚠️ دو ایراد اینجا بود که هر دو لینک را بی‌صدا می‌شکستند:
+
+                 ۱. شماره با رقم فارسی («۰۲۱-۱۲۳۴۵۶۷۸») مستقیم داخل
+                    `tel:` می‌رفت. اندروید و iOS در آن هیچ رقمی
+                    نمی‌بینند: نه خطایی، نه تماسی.
+
+                 ۲. اگر تنظیمات خالی بود، `href` به «tel:» تهی
+                    می‌رسید در حالی که *متن* به مقدار جایگزین فایل
+                    ترجمه برمی‌گشت — یعنی کاربر شماره‌ای می‌دید که
+                    کلیک رویش هیچ کاری نمی‌کرد.
+
+                 حالا هر دو از یک متغیر می‌آیند.
             */}
             <a
-              href={`tel:${settings.contactPhone ?? ''}`}
+              href={`tel:${toAsciiDigits(phone).replace(/[^\d+]/g, '')}`}
               className="flex items-center gap-1.5 transition-colors hover:text-foreground"
             >
               <Phone className="size-3.5" aria-hidden="true" />
-              {settings.contactPhone ?? tTop('phone')}
+              {phone}
             </a>
             <span>{settings.supportHours ?? tTop('support')}</span>
           </div>
