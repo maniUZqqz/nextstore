@@ -33,6 +33,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
 
+    /*
+     * ⚠️ کشف خودکار فرمان‌های `app/Console/Commands`.
+     *
+     *    لاراول ۱۱ به بعد این کار را **خودکار انجام نمی‌دهد**؛ فقط
+     *    `routes/console.php` را می‌خواند. کلاس فرمانی که آنجا ثبت
+     *    نشود، با «There are no commands defined» رد می‌شود — پیامی که
+     *    شبیه غلط تایپی نام فرمان به نظر می‌رسد، نه ثبت‌نشدن کلاس.
+     */
+    ->withCommands([
+        __DIR__.'/../app/Console/Commands',
+    ])
+
     ->withMiddleware(function (Middleware $middleware): void {
         /*
          * تشخیص زبان از هدر Accept-Language برای تمام مسیرهای API.

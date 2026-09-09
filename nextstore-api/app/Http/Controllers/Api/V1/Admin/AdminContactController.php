@@ -18,6 +18,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class AdminContactController extends Controller
 {
     /**
+     * صندوق پیام‌های تماس — با فیلتر و جست‌وجو.
+     *
      * GET /api/v1/admin/contact-messages?status=unread
      */
     public function index(Request $request): AnonymousResourceCollection
@@ -54,6 +56,8 @@ class AdminContactController extends Controller
     }
 
     /**
+     * متن کامل یک پیام — و علامت‌گذاری آن به‌عنوان خوانده‌شده.
+     *
      * GET /api/v1/admin/contact-messages/{contactMessage}
      *
      * ⚠️ باز کردن پیام، آن را خوانده‌شده می‌کند.

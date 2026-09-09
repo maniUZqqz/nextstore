@@ -251,7 +251,16 @@ cd nextstore-api
 ../tools/php/php.exe artisan test                      # ۲۰۱ تست Pest
 ../tools/php/php.exe vendor/bin/pint                   # قالب‌بندی کد
 ../tools/php/php.exe ../tools/composer.phar analyse    # تحلیل ایستا (PHPStan)
+../tools/php/php.exe artisan docs:api                  # ساخت مستندات API
 ```
+
+مستندات هر ۱۲۴ اندپوینت در [`nextstore-api/docs/API.md`](nextstore-api/docs/API.md)
+است.
+
+⚠️ آن فایل **دستی نوشته نمی‌شود**: از روی جدول مسیرهای لاراول و
+docblock خودِ کنترلرها ساخته می‌شود. پس اگر توضیحی غلط بود، جای
+اصلاحش همان متد کنترلر است نه فایل مستندات — وگرنه دفعه‌ی بعد که
+فرمان اجرا شود، اصلاح شما پاک می‌شود.
 
 ⚠️ تحلیل ایستا را با اسکریپت composer اجرا کنید نه مستقیم: سقف حافظه‌ی
 پیش‌فرض PHP برای این پروژه کم است و خطایش («Child process error») شبیه

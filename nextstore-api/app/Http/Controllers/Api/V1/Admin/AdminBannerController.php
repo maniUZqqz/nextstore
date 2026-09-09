@@ -26,6 +26,8 @@ class AdminBannerController extends Controller
     ) {}
 
     /**
+     * فهرست بنرها — با فیلتر جایگاه، بدون صفحه‌بندی.
+     *
      * GET /api/v1/admin/banners?placement=hero
      *
      * ⚠️ بدون صفحه‌بندی — و این عمدی است.
@@ -47,13 +49,21 @@ class AdminBannerController extends Controller
             ->additional(['meta' => $this->meta()]);
     }
 
-    /** GET /api/v1/admin/banners/{banner} */
+    /**
+     * جزئیات یک بنر — برای پر کردن فرم ویرایش.
+     *
+     * GET /api/v1/admin/banners/{banner}
+     */
     public function show(Banner $banner): JsonResponse
     {
         return (new AdminBannerResource($banner))->response();
     }
 
-    /** POST /api/v1/admin/banners */
+    /**
+     * ساخت بنر تازه.
+     *
+     * POST /api/v1/admin/banners
+     */
     public function store(StoreBannerRequest $request): JsonResponse
     {
         $banner = Banner::query()->create($this->payload($request));
@@ -73,7 +83,11 @@ class AdminBannerController extends Controller
             ->setStatusCode(201);
     }
 
-    /** PUT /api/v1/admin/banners/{banner} */
+    /**
+     * ویرایش یک بنر.
+     *
+     * PUT /api/v1/admin/banners/{banner}
+     */
     public function update(StoreBannerRequest $request, Banner $banner): JsonResponse
     {
         $banner->update($this->payload($request));
@@ -85,7 +99,11 @@ class AdminBannerController extends Controller
             ->response();
     }
 
-    /** DELETE /api/v1/admin/banners/{banner} */
+    /**
+     * حذف یک بنر.
+     *
+     * DELETE /api/v1/admin/banners/{banner}
+     */
     public function destroy(Banner $banner): JsonResponse
     {
         $banner->delete();

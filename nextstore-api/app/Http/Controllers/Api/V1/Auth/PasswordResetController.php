@@ -23,6 +23,8 @@ use Illuminate\Support\Str;
 class PasswordResetController extends Controller
 {
     /**
+     * ارسال پیوند بازیابی رمز به ایمیل کاربر.
+     *
      * POST /api/v1/auth/forgot-password
      *
      * ⚠️ پاسخ **همیشه** یکسان است، چه ایمیل وجود داشته باشد چه نه.
@@ -78,6 +80,8 @@ class PasswordResetController extends Controller
     }
 
     /**
+     * ثبت رمز تازه با توکنی که در ایمیل آمده.
+     *
      * POST /api/v1/auth/reset-password
      *
      * ⚠️ برخلاف مسیر بالا، اینجا خطای دقیق برگردانده می‌شود.

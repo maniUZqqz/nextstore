@@ -23,6 +23,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class NotificationController extends Controller
 {
     /**
+     * فهرست اعلان‌های کاربر — با فیلتر خوانده‌نشده.
+     *
      * GET /api/v1/notifications?status=unread
      */
     public function index(Request $request): AnonymousResourceCollection
@@ -41,6 +43,8 @@ class NotificationController extends Controller
     }
 
     /**
+     * شمار اعلان‌های خوانده‌نشده.
+     *
      * GET /api/v1/notifications/unread-count
      *
      * ⚠️ اندپوینت جدا و سبک، چون نشان زنگوله در **هر بارگذاری صفحه**
@@ -55,6 +59,8 @@ class NotificationController extends Controller
     }
 
     /**
+     * علامت‌گذاری یک اعلان به‌عنوان خوانده‌شده.
+     *
      * PATCH /api/v1/notifications/{notification}/read
      */
     public function markRead(Request $request, int $notification): JsonResponse
@@ -86,6 +92,8 @@ class NotificationController extends Controller
     }
 
     /**
+     * حذف یک اعلان.
+     *
      * DELETE /api/v1/notifications/{notification}
      */
     public function destroy(Request $request, int $notification): JsonResponse
