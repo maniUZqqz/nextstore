@@ -496,7 +496,32 @@
       "processing": "آماده‌سازی",
       "shipped": "ارسال",
       "delivered": "تحویل"
-    }
+    },
+    "invoice": "فاکتور"
+  },
+  "invoice": {
+    "title": "فاکتور فروش",
+    "print": "چاپ یا ذخیره‌ی PDF",
+    "backToOrder": "بازگشت به سفارش",
+    "saveHint": "برای ذخیره به‌صورت PDF، در پنجره‌ی چاپ گزینه‌ی مقصد را روی «Save as PDF» بگذارید.",
+    "billTo": "خریدار",
+    "orderInfo": "اطلاعات سفارش",
+    "postalCode": "کد پستی",
+    "shippingMethod": "روش ارسال",
+    "paymentStatus": "وضعیت پرداخت",
+    "items": "اقلام سفارش",
+    "product": "کالا",
+    "unitPrice": "قیمت واحد",
+    "quantity": "تعداد",
+    "lineTotal": "جمع",
+    "subtotal": "جمع کالاها",
+    "discount": "تخفیف",
+    "shipping": "هزینه ارسال",
+    "tax": "مالیات",
+    "total": "مبلغ نهایی",
+    "note": "یادداشت خریدار",
+    "thanks": "از خرید شما از {store} سپاسگزاریم.",
+    "footerNote": "این فاکتور به‌صورت خودکار صادر شده و نیازی به مهر و امضا ندارد."
   },
   "admin": {
     "title": "پنل مدیریت",

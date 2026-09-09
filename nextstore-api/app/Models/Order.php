@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Enums\ShippingMethod;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,6 +39,7 @@ class Order extends Model
     {
         return [
             'status' => OrderStatus::class,
+            'shipping_method' => ShippingMethod::class,
             'shipping_address' => 'array',
 
             'subtotal' => 'integer',

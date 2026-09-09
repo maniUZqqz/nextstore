@@ -260,3 +260,39 @@ describe('ثبت سفارش با کد تخفیف', function () {
         expect($cart->fresh()->coupon_id)->toBeNull();
     });
 });
+
+describe('روش ارسال', function () {
+    /*
+     * ⚠️ باگی که این بخش نگه می‌دارد.
+     *
+     *    `shipping_method` یک رشته‌ی خام بود و ریسورس همان را بیرون
+     *    می‌داد. نتیجه‌اش این بود که صفحه‌ی سفارش و فاکتور، عبارت
+     *    «standard» را عیناً به مشتری فارسی‌زبان نشان می‌دادند — بدون
+     *    هیچ خطایی، فقط زشت و در فاکتور غیرحرفه‌ای.
+     */
+    it('برچسب محلی‌شده را همراه کلید می‌فرستد', function () {
+        $user = User::factory()->create();
+        $order = Order::factory()->for($user)->create(['shipping_method' => 'standard']);
+
+        $this->actingAs($user, 'sanctum');
+
+        $fa = $this->getJson("/api/v1/orders/{$order->order_number}", ['Accept-Language' => 'fa']);
+        $en = $this->getJson("/api/v1/orders/{$order->order_number}", ['Accept-Language' => 'en']);
+
+        expect($fa->json('data.shippingMethod'))->toBe('standard')
+            ->and($fa->json('data.shippingMethodLabel'))->toBe('ارسال عادی')
+            ->and($en->json('data.shippingMethodLabel'))->toBe('Standard shipping');
+    });
+
+    it('برای ارسال سریع هم برچسب می‌دهد', function () {
+        $user = User::factory()->create();
+        $order = Order::factory()->for($user)->create(['shipping_method' => 'express']);
+
+        $this->actingAs($user, 'sanctum');
+
+        $response = $this->getJson("/api/v1/orders/{$order->order_number}", ['Accept-Language' => 'fa']);
+
+        expect($response->json('data.shippingMethodLabel'))->toBe('ارسال سریع')
+            ->and($response->json('data.shippingMethodDescription'))->toContain('روز کاری');
+    });
+});

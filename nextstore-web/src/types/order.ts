@@ -133,7 +133,17 @@ export interface OrderPayment {
 export interface OrderDetail extends Order {
   items: OrderItem[]
   shippingAddress: OrderShippingAddress
+
+  /**
+   * کلید ماشین‌خوان روش ارسال: 'standard' یا 'express'.
+   *
+   * ⚠️ برای **نمایش** از `shippingMethodLabel` استفاده کنید، نه این.
+   *    پیش‌تر همین کلید خام روی صفحه‌ی سفارش و فاکتور چاپ می‌شد و
+   *    مشتری فارسی‌زبان عبارت «standard» را می‌دید.
+   */
   shippingMethod: string
+  shippingMethodLabel: string
+  shippingMethodDescription: string
   customerNote: string | null
   payment: OrderPayment | null
   cancelledAt: string | null

@@ -496,7 +496,32 @@
       "processing": "Preparing",
       "shipped": "Shipped",
       "delivered": "Delivered"
-    }
+    },
+    "invoice": "Invoice"
+  },
+  "invoice": {
+    "title": "Invoice",
+    "print": "Print or save as PDF",
+    "backToOrder": "Back to order",
+    "saveHint": "To save as a PDF, set the destination to “Save as PDF” in the print dialog.",
+    "billTo": "Bill to",
+    "orderInfo": "Order details",
+    "postalCode": "Postal code",
+    "shippingMethod": "Shipping method",
+    "paymentStatus": "Payment status",
+    "items": "Order items",
+    "product": "Item",
+    "unitPrice": "Unit price",
+    "quantity": "Qty",
+    "lineTotal": "Total",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "tax": "Tax",
+    "total": "Grand total",
+    "note": "Customer note",
+    "thanks": "Thank you for shopping at {store}.",
+    "footerNote": "This invoice was issued automatically and needs no signature or stamp."
   },
   "admin": {
     "title": "Admin panel",

@@ -18,7 +18,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslations, useLocale } from 'next-intl'
 import {
   Package, MapPin, CreditCard, Check, X, AlertCircle,
-  Loader2, StickyNote, Truck, ShoppingBag,
+  Loader2, StickyNote, Truck, ShoppingBag, FileText,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
@@ -127,14 +127,31 @@ export function OrderDetailView({ orderNumber }: { orderNumber: string }) {
             )}
           </div>
 
-          <span
-            className={cn(
-              'rounded-(--radius-sm) px-3 py-1.5 text-sm font-semibold',
-              STATUS_CLASSES[order.statusColor],
-            )}
-          >
-            {order.statusLabel}
-          </span>
+          <div className="flex flex-wrap items-center gap-3">
+            {/*
+              ⚠️ دکمه‌ی فاکتور کنار نشان وضعیت است، نه پایین صفحه.
+
+                 کسی که دنبال فاکتور می‌آید معمولاً فقط همان را
+                 می‌خواهد؛ گذاشتنش زیر فهرست اقلام یعنی باید کل صفحه را
+                 پایین برود تا پیدایش کند.
+            */}
+            <Link
+              href={`/account/orders/${order.orderNumber}/invoice`}
+              className="inline-flex h-9 items-center gap-1.5 rounded-(--radius-md) border border-border px-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <FileText className="size-4" aria-hidden="true" />
+              {t('invoice')}
+            </Link>
+
+            <span
+              className={cn(
+                'rounded-(--radius-sm) px-3 py-1.5 text-sm font-semibold',
+                STATUS_CLASSES[order.statusColor],
+              )}
+            >
+              {order.statusLabel}
+            </span>
+          </div>
         </div>
 
         {/* --- نوار پیشرفت سفارش --- */}
@@ -364,7 +381,7 @@ export function OrderDetailView({ orderNumber }: { orderNumber: string }) {
 
           <p className="mt-3 flex items-center gap-1.5 border-t border-border pt-3 text-xs text-muted-foreground">
             <Truck className="size-3.5" aria-hidden="true" />
-            {t('shippingMethod')}: {order.shippingMethod}
+            {t('shippingMethod')}: {order.shippingMethodLabel}
           </p>
         </section>
 

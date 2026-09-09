@@ -45,7 +45,17 @@ class OrderDetailResource extends OrderResource
 
             /* آدرس تحویل — عکس لحظه‌ای ثبت‌شده در سفارش */
             'shippingAddress' => $this->shipping_address,
-            'shippingMethod' => $this->shipping_method,
+            /*
+             * ⚠️ کلید و برچسب هر دو می‌روند.
+             *
+             *    پیش‌تر فقط رشته‌ی خام («standard») فرستاده می‌شد و
+             *    صفحه‌ی سفارش و فاکتور همان را به مشتری فارسی‌زبان نشان
+             *    می‌دادند. برچسب از اینجا می‌آید تا فرانت نگاشت دومی
+             *    نسازد — همان قاعده‌ی وضعیت سفارش و تیکت.
+             */
+            'shippingMethod' => $this->shipping_method->value,
+            'shippingMethodLabel' => $this->shipping_method->label($locale),
+            'shippingMethodDescription' => $this->shipping_method->description($locale),
             'customerNote' => $this->customer_note,
 
             /* --- وضعیت پرداخت --- */
