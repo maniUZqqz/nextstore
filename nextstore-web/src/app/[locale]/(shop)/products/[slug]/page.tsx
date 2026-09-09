@@ -30,6 +30,7 @@ import { ProductRow } from '@/components/home/ProductRow'
 import {
   formatPrice, formatNumber, formatDiscount, currencyLabel,
 } from '@/lib/utils/format'
+import { ogImageUrl } from '@/lib/utils/site-url'
 
 /**
  * متادیتای سئو — از فیلد seo محصول که بک‌اند محاسبه کرده است.
@@ -51,7 +52,15 @@ export async function generateMetadata({
       openGraph: {
         title: product.seo.title,
         description: product.seo.description ?? undefined,
-        images: product.images[0] ? [{ url: product.images[0].url }] : undefined,
+        /*
+         * ⚠️ محصول بدون عکس هم باید کارت درست بدهد.
+         *
+         *    پیش‌تر `undefined` می‌رفت و چون متادیتای سایت
+         *    `summary_large_image` اعلام می‌کند، شبکه‌ی اجتماعی یک
+         *    مستطیل خاکستری خالی نشان می‌داد. حالا به تصویر عمومی
+         *    فروشگاه برمی‌گردد.
+         */
+        images: [product.images[0]?.url ?? ogImageUrl(locale)],
       },
     }
   } catch {

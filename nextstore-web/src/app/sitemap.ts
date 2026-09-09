@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next'
 import { LOCALES, routing } from '@/i18n/routing'
 import { getProducts, getCategories, getBrands } from '@/lib/api/catalog'
 import { getPosts, getPostCategories } from '@/lib/api/blog'
+import { SITE_URL } from '@/lib/utils/site-url'
 
 /**
  * نقشه‌ی سایت (sitemap.xml)
@@ -20,7 +21,7 @@ import { getPosts, getPostCategories } from '@/lib/api/blog'
  */
 
 /** آدرس پایه — بدون اسلش انتهایی تا آدرس‌ها دوتا اسلش نگیرند. */
-const BASE = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '')
+const BASE = SITE_URL
 
 /**
  * مسیرهای ایستای عمومی.

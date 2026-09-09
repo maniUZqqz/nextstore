@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "check:i18n": "node scripts/check-i18n.mjs",
     "shots": "node scripts/shots.mjs",
     "test:e2e": "node scripts/run-e2e.mjs"
   },

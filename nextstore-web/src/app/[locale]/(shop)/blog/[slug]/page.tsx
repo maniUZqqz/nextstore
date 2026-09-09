@@ -22,6 +22,7 @@ import { PostCard } from '@/components/blog/PostCard'
 import { ShareButton } from '@/components/blog/ShareButton'
 import { formatDate, formatNumber } from '@/lib/utils/format'
 import type { PostDetail } from '@/types/post'
+import { ogImageUrl } from '@/lib/utils/site-url'
 
 /**
  * خواندن مقاله با تبدیل ۴۰۴ به notFound.
@@ -67,7 +68,8 @@ export async function generateMetadata({
       description: post.excerpt ?? undefined,
       publishedTime: post.publishedAt ?? undefined,
       authors: post.authorName ? [post.authorName] : undefined,
-      images: post.coverImage ? [{ url: post.coverImage }] : undefined,
+      /* مقاله‌ی بدون کاور هم باید کارت درست بدهد — همان دلیل صفحه‌ی محصول */
+      images: [post.coverImage ?? ogImageUrl(locale)],
     },
   }
 }

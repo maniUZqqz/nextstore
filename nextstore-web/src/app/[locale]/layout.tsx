@@ -25,6 +25,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl'
 import { getTranslations, getMessages, setRequestLocale } from 'next-intl/server'
 import { withoutAdminMessages } from '@/i18n/messages'
 import { routing, getDirection, LOCALES } from '@/i18n/routing'
+import { SITE_URL, ogImageUrl } from '@/lib/utils/site-url'
 import { Providers } from '@/components/providers/Providers'
 import './../globals.css'
 
@@ -48,7 +49,7 @@ export async function generateMetadata({
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'meta' })
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  const baseUrl = SITE_URL
 
   return {
     title: {
@@ -71,7 +72,22 @@ export async function generateMetadata({
       ),
     },
 
-    /* پیش‌نمایش هنگام اشتراک‌گذاری در شبکه‌های اجتماعی */
+    /*
+     * پیش‌نمایش هنگام اشتراک‌گذاری در شبکه‌های اجتماعی.
+     *
+     * ⚠️ تصویر اجباری است، نه تزئینی.
+     *
+     *    `card: 'summary_large_image'` به شبکه‌ها **وعده‌ی تصویر بزرگ**
+     *    می‌دهد. پیش‌تر هیچ تصویری فرستاده نمی‌شد و نتیجه‌اش کارتی بود
+     *    با یک مستطیل خاکستری خالی — بدتر از کارت ساده‌ی بدون تصویر.
+     *    فقط صفحه‌ی محصول عکس داشت (اولین تصویر کالا).
+     *
+     * ⚠️ نشانی **مطلق** است. شبکه‌های اجتماعی صفحه را از سرور خودشان
+     *    می‌گیرند و مسیر نسبی برایشان بی‌معناست.
+     *
+     *    تصویرها با `node scripts/build-og.mjs` ساخته می‌شوند و در
+     *    مخزن‌اند — نه در زمان بیلد، تا CI به مرورگر نیاز نداشته باشد.
+     */
     openGraph: {
       type: 'website',
       locale: locale === 'fa' ? 'fa_IR' : 'en_US',
@@ -79,12 +95,19 @@ export async function generateMetadata({
       siteName: t('siteName'),
       title: t('title'),
       description: t('description'),
+      images: [{
+        url: ogImageUrl(locale),
+        width: 1200,
+        height: 630,
+        alt: t('siteName'),
+      }],
     },
 
     twitter: {
       card: 'summary_large_image',
       title: t('title'),
       description: t('description'),
+      images: [ogImageUrl(locale)],
     },
 
     /** آیکون تب مرورگر */

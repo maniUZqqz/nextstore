@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { SITE_URL } from '@/lib/utils/site-url'
 
 /**
  * فایل robots.txt
@@ -16,7 +17,7 @@ import type { MetadataRoute } from 'next'
  *    ضمانت واقعی است.
  */
 
-const BASE = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '')
+const BASE = SITE_URL
 
 /**
  * مسیرهایی که خزیده نمی‌شوند.

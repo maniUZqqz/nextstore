@@ -1,0 +1,167 @@
+name: CI
+
+# =============================================================================
+# ⚠️ این فایل چه کاری می‌کند که هوک پیش از کامیت نمی‌کند؟
+#
+#    هوک محلی فقط **فایل‌های استیج‌شده** را بررسی می‌کند و عمداً تست
+#    اجرا نمی‌کند (سوئیت کامل هر کامیت را به یک مکث تبدیل می‌کرد و
+#    نتیجه‌اش این می‌شد که آدم `--no-verify` را یاد بگیرد).
+#
+#    اینجا کل پروژه بررسی می‌شود، با تست کامل — چیزی که یک بار در هر
+#    push ارزشش را دارد. و مهم‌تر: هوک را می‌شود دور زد، این را نه.
+#
+# ⚠️ سه کار عمداً **موازی**اند و در سه job جدا نشسته‌اند.
+#
+#    اگر همه در یک job بودند، شکست Pint جلوی اجرای تست‌ها را می‌گرفت و
+#    باید دو بار push می‌کردی تا بفهمی چند مشکل داری. حالا هر سه گزارش
+#    خودشان را می‌دهند.
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+# ⚠️ اجرای قدیمی همان شاخه لغو می‌شود.
+#
+#    بدون این، پنج push پشت‌سرهم یعنی پنج اجرای کامل که چهارتایش
+#    نتیجه‌اش را کسی نمی‌بیند — فقط صف را طولانی می‌کند.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ===========================================================================
+  # بک‌اند — قالب‌بندی، تحلیل ایستا، تست
+  # ===========================================================================
+  backend:
+    name: Laravel
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: نصب PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          # ⚠️ sqlite3 و pdo_sqlite الزامی‌اند: تست‌ها روی SQLite در
+          #    حافظه اجرا می‌شوند (phpunit.xml) و بدون این افزونه‌ها
+          #    خطای «could not find driver» می‌دهند.
+          extensions: mbstring, sqlite3, pdo_sqlite, intl, bcmath
+          coverage: none
+
+      - name: کش وابستگی‌های Composer
+        uses: actions/cache@v4
+        with:
+          path: nextstore-api/vendor
+          key: composer-${{ hashFiles('nextstore-api/composer.lock') }}
+
+      - name: نصب وابستگی‌ها
+        working-directory: nextstore-api
+        # --no-interaction چون هیچ‌کس اینجا نیست که به سؤال جواب بدهد
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: آماده‌سازی محیط
+        working-directory: nextstore-api
+        # ⚠️ APP_KEY لازم است حتی برای تست: بدون آن هر فراخوانی رمزنگاری
+        #    (از جمله ساخت توکن Sanctum) استثنا می‌دهد.
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: قالب‌بندی کد (Pint)
+        working-directory: nextstore-api
+        # --test یعنی فقط گزارش بده، فایل را عوض نکن
+        run: vendor/bin/pint --test
+
+      - name: تحلیل ایستا (PHPStan)
+        working-directory: nextstore-api
+        # ⚠️ سقف حافظه صریح است. پیش‌فرض PHP برای این پروژه کم است و
+        #    خطایش («Child process error») شبیه باگ خود ابزار به نظر
+        #    می‌رسد نه کمبود حافظه — تشخیصش وقت‌گیر است.
+        run: php -d memory_limit=1G vendor/bin/phpstan analyse --no-progress
+
+      - name: تست‌ها (Pest)
+        working-directory: nextstore-api
+        run: php artisan test
+
+  # ===========================================================================
+  # فرانت‌اند — تایپ، لینت، بیلد
+  # ===========================================================================
+  frontend:
+    name: Next.js
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: نصب pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: نصب Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: nextstore-web/pnpm-lock.yaml
+
+      - name: نصب وابستگی‌ها
+        working-directory: nextstore-web
+        # --frozen-lockfile یعنی اگر lock با package.json نخواند، شکست
+        # بخور — نه اینکه بی‌صدا نسخه‌ی دیگری نصب کنی
+        run: pnpm install --frozen-lockfile
+
+      - name: بررسی تایپ
+        working-directory: nextstore-web
+        run: pnpm typecheck
+
+      - name: لینت
+        working-directory: nextstore-web
+        # ⚠️ --max-warnings=0 الزامی است: پیکربندی این پروژه «متغیر
+        #    بلااستفاده» را warning می‌داند و ESLint با warning کد خروج
+        #    ۰ می‌دهد. بدون این پرچم، مرحله سبز می‌شد و هشدارها انباشته
+        #    می‌شدند.
+        run: pnpm lint --max-warnings=0
+
+      - name: بیلد
+        working-directory: nextstore-web
+        # ⚠️ بیلد به API نیاز ندارد.
+        #
+        #    صفحه‌های ایستا در زمان بیلد داده می‌گیرند، ولی همه‌ی توابع
+        #    لایه‌ی API خطا را می‌گیرند و مقدار تهی برمی‌گردانند. اگر
+        #    روزی این مرحله شکست، احتمالاً جایی این محافظ حذف شده — نه
+        #    اینکه CI به سرور نیاز داشته باشد.
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8100/api/v1
+        run: pnpm build
+
+  # ===========================================================================
+  # برابری کلیدهای ترجمه
+  # ===========================================================================
+  # ⚠️ چرا job جدا و نه یک تست معمولی؟
+  #
+  #    این بررسی نه به PHP نیاز دارد نه به Node و در چند ثانیه تمام
+  #    می‌شود. جدا بودنش یعنی وقتی کسی یک کلید فارسی اضافه می‌کند و
+  #    انگلیسی را جا می‌اندازد، همان لحظه می‌فهمد — نه بعد از سه دقیقه
+  #    انتظار برای بیلد.
+  #
+  #    این خطا در عمل رخ می‌دهد و بی‌صدا هم هست: next-intl کلید غایب را
+  #    در حالت توسعه با متن خودِ کلید نشان می‌دهد، پس تا وقتی کسی سایت
+  #    را انگلیسی باز نکند معلوم نمی‌شود.
+  i18n:
+    name: برابری ترجمه‌ها
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: مقایسه‌ی کلیدهای fa و en
+        working-directory: nextstore-web
+        run: node scripts/check-i18n.mjs
