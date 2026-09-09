@@ -13,7 +13,7 @@
 import { useTranslations } from 'next-intl'
 import {
   LayoutDashboard, Package, ShoppingBag, Users, Tags, Settings, Store, FileText, Bookmark,
-  MessageSquare, LifeBuoy, Ticket, Inbox,
+  MessageSquare, LifeBuoy, Ticket, Inbox, Image as ImageIcon,
 } from 'lucide-react'
 import { Link, usePathname } from '@/i18n/navigation'
 import { cn } from '@/lib/utils/cn'
@@ -37,6 +37,7 @@ export function AdminSidebar() {
     { href: '/admin/posts', label: t('nav.posts'), Icon: FileText },
     { href: '/admin/categories', label: t('nav.categories'), Icon: Tags },
     { href: '/admin/brands', label: t('nav.brands'), Icon: Bookmark },
+    { href: '/admin/banners', label: t('nav.banners'), Icon: ImageIcon },
     { href: '/admin/reviews', label: t('nav.reviews'), Icon: MessageSquare },
     { href: '/admin/tickets', label: t('nav.tickets'), Icon: LifeBuoy },
     { href: '/admin/messages', label: t('nav.messages'), Icon: Inbox },

@@ -25,6 +25,7 @@ import {
 import { Link } from '@/i18n/navigation'
 import type { Locale } from '@/i18n/routing'
 import { getHomeData } from '@/lib/api/catalog'
+import { getBanners } from '@/lib/api/banners'
 import type { HomeData } from '@/types/product'
 import { HeroSlider } from '@/components/home/HeroSlider'
 import { CategoryCircles } from '@/components/home/CategoryCircles'
@@ -50,6 +51,21 @@ export default async function HomePage({
   } catch {
     home = null
   }
+
+  /*
+   * بنرهای تبلیغاتی — از پنل مدیریت.
+   *
+   * ⚠️ اینجا گرفته می‌شوند و به‌صورت prop پایین می‌روند، نه در خود
+   *    کامپوننت‌ها.
+   *
+   *    `HeroSlider` کلاینت-کامپوننت است و `PromoBanners` سرور؛ اگر هر
+   *    کدام خودش می‌گرفت، دو درخواست جدا برای یک اندپوینت می‌شد و
+   *    اسلایدر تا رسیدن داده روی صفحه می‌پرید.
+   *
+   * ⚠️ `getBanners` هرگز throw نمی‌کند و در بدترین حالت فهرست تهی
+   *    می‌دهد، پس try/catch جداگانه لازم ندارد.
+   */
+  const banners = await getBanners(locale)
 
   /** نوار خدمات فروشگاه. */
   const features = [
@@ -87,7 +103,7 @@ export default async function HomePage({
         {/* ==========================================================
             ۱. اسلایدر بنر تبلیغاتی
             ========================================================== */}
-        <HeroSlider />
+        <HeroSlider slides={banners.hero} />
 
         {/* ==========================================================
             ۲. ردیف دایره‌ای دسته‌بندی‌ها
@@ -167,7 +183,7 @@ export default async function HomePage({
         {/* ==========================================================
             ۵. بنرهای تبلیغاتی میان‌صفحه
             ========================================================== */}
-        <PromoBanners />
+        <PromoBanners banners={banners.promo} />
 
         {/* ==========================================================
             ۶. پرفروش‌ترین‌ها

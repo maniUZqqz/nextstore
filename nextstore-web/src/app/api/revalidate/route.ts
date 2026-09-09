@@ -47,7 +47,7 @@ import { NextResponse } from 'next/server'
  *    هر برچسبی را باطل کند. ولی هزینه‌اش این است که جا انداختن یک
  *    برچسب، درخواست را **بی‌صدا رد** می‌کند و کش هرگز تازه نمی‌شود.
  */
-const ALLOWED_TAGS = ['products', 'categories', 'brands', 'home', 'settings'] as const
+const ALLOWED_TAGS = ['products', 'categories', 'brands', 'home', 'settings', 'banners'] as const
 
 type AllowedTag = (typeof ALLOWED_TAGS)[number]
 

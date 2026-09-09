@@ -14,6 +14,7 @@
  *   Admin     → نیازمند نقش مدیر                      ← فاز بعد
  */
 
+use App\Http\Controllers\Api\V1\Admin\AdminBannerController;
 use App\Http\Controllers\Api\V1\Admin\AdminBrandController;
 use App\Http\Controllers\Api\V1\Admin\AdminCategoryController;
 use App\Http\Controllers\Api\V1\Admin\AdminContactController;
@@ -32,6 +33,7 @@ use App\Http\Controllers\Api\V1\Customer\OrderController;
 use App\Http\Controllers\Api\V1\Customer\ProfileController;
 use App\Http\Controllers\Api\V1\Customer\TicketController;
 use App\Http\Controllers\Api\V1\Customer\WishlistController;
+use App\Http\Controllers\Api\V1\Shop\BannerController;
 use App\Http\Controllers\Api\V1\Shop\BlogController;
 use App\Http\Controllers\Api\V1\Shop\CartController;
 use App\Http\Controllers\Api\V1\Shop\CatalogController;
@@ -127,6 +129,14 @@ Route::prefix('v1')->group(function () {
      * فوتر و نوار بالای هدر از این تغذیه می‌شوند، پس بدون احراز هویت است.
      */
     Route::get('settings', [SettingsController::class, 'index'])->name('api.settings');
+
+    /*
+     * بنرهای تبلیغاتی صفحه‌ی اصلی.
+     *
+     * ⚠️ بدون احراز هویت و کش‌شدنی — صفحه‌ی اصلی برای هر بازدیدکننده
+     *    رندر می‌شود و بنرها هفته‌ها عوض نمی‌شوند.
+     */
+    Route::get('banners', [BannerController::class, 'index'])->name('api.banners');
 
     /*
      * فرم «تماس با ما».
@@ -297,6 +307,14 @@ Route::prefix('v1')->group(function () {
         /* --- تنظیمات فروشگاه --- */
         Route::get('settings', [AdminSettingController::class, 'index'])->name('api.admin.settings.index');
         Route::put('settings', [AdminSettingController::class, 'update'])->name('api.admin.settings.update');
+
+        /* --- بنرهای صفحه‌ی اصلی --- */
+        Route::get('banners', [AdminBannerController::class, 'index'])->name('api.admin.banners.index');
+        Route::post('banners', [AdminBannerController::class, 'store'])->name('api.admin.banners.store');
+        Route::get('banners/{banner}', [AdminBannerController::class, 'show'])->name('api.admin.banners.show');
+        Route::put('banners/{banner}', [AdminBannerController::class, 'update'])->name('api.admin.banners.update');
+        Route::delete('banners/{banner}', [AdminBannerController::class, 'destroy'])->name('api.admin.banners.destroy');
+        Route::patch('banners/{banner}/toggle', [AdminBannerController::class, 'toggle'])->name('api.admin.banners.toggle');
 
         /* --- صندوق پیام‌های تماس --- */
         Route::get('contact-messages', [AdminContactController::class, 'index'])->name('api.admin.contact.index');

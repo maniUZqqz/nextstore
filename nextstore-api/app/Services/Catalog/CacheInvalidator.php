@@ -44,6 +44,8 @@ class CacheInvalidator
 
     public const TAG_SETTINGS = 'settings';
 
+    public const TAG_BANNERS = 'banners';
+
     /**
      * پاک کردن کامل کش کاتالوگ — لاراول و نکست.
      *
@@ -71,6 +73,25 @@ class CacheInvalidator
     {
         Setting::flushCache();
         $this->notifyFrontend([self::TAG_SETTINGS]);
+    }
+
+    /**
+     * باطل کردن کش بنرهای صفحه‌ی اصلی.
+     *
+     * ⚠️ برچسب `home` هم باطل می‌شود، نه فقط `banners`.
+     *
+     *    بنرها روی صفحه‌ی اصلی رندر می‌شوند و آن صفحه با برچسب `home`
+     *    کش شده است. باطل‌کردن تنها `banners` یعنی تابع گرفتن بنر
+     *    دوباره اجرا می‌شود ولی صفحه‌ای که آن را نشان می‌دهد از کش
+     *    قدیمی می‌آید — و مدیر بنری را که خاموش کرده هنوز روی سایت
+     *    می‌بیند.
+     *
+     * ⚠️ کش کاتالوگ دست نمی‌خورد: عوض کردن یک بنر نباید کش صدها
+     *    محصول را بسوزاند.
+     */
+    public function flushBanners(): void
+    {
+        $this->notifyFrontend([self::TAG_BANNERS, self::TAG_HOME]);
     }
 
     /**

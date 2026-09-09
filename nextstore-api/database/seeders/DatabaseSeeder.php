@@ -47,6 +47,13 @@ class DatabaseSeeder extends Seeder
              * دوباره‌اش تغییرات مدیر را بازنمی‌گرداند.
              */
             SettingSeeder::class,
+
+            /*
+             * بنرهای صفحه‌ی اصلی — همان محتوایی که پیش‌تر در کد بود.
+             * با firstOrCreate کار می‌کند، پس ویرایش‌های مدیر را
+             * بازنویسی نمی‌کند.
+             */
+            BannerSeeder::class,
         ]);
     }
 

@@ -165,4 +165,14 @@ return [
     'contact_message_short' => 'Your message must be at least :min characters.',
     'contact_sent' => 'Your message has been received. We will reply soon.',
     'contact_deleted' => 'Message deleted.',
+
+    /* --- بنرها --- */
+    'banner_title_required' => 'A Persian title is required.',
+    'banner_href_required' => 'Please enter the banner destination.',
+    'banner_href_internal' => 'The destination must be an internal path starting with / - external URLs are not accepted.',
+    'banner_icon_invalid' => 'An icon name may only contain lowercase letters, digits and hyphens.',
+    'banner_date_order' => 'The end date must be after the start date.',
+    'banner_created' => 'Banner created.',
+    'banner_updated' => 'Banner updated.',
+    'banner_deleted' => 'Banner deleted.',
 ];

@@ -14,6 +14,7 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "save": "Save",
+    "saved": "Saved.",
     "edit": "Edit",
     "delete": "Delete",
     "back": "Back",
@@ -84,26 +85,6 @@
     "current": "Current language: English"
   },
   "home": {
-    "slides": {
-      "one": {
-        "badge": "Autumn Sale",
-        "title": "Up to 50% off electronics",
-        "subtitle": "Phones, laptops and accessories at the best prices",
-        "cta": "Shop deals"
-      },
-      "two": {
-        "badge": "Just arrived",
-        "title": "The latest smartphones",
-        "subtitle": "Today's flagships with an authenticity guarantee",
-        "cta": "Shop now"
-      },
-      "three": {
-        "badge": "Free shipping",
-        "title": "On every order over $50",
-        "subtitle": "Free nationwide delivery, no conditions",
-        "cta": "Start shopping"
-      }
-    },
     "features": {
       "shipping": {
         "title": "Free shipping",
@@ -140,20 +121,6 @@
       "minutes": "min",
       "seconds": "sec",
       "ended": "Ended"
-    },
-    "promo": {
-      "one": {
-        "title": "Home Appliances",
-        "subtitle": "Up to 30% off"
-      },
-      "two": {
-        "title": "Fashion",
-        "subtitle": "New season collection"
-      },
-      "three": {
-        "title": "Sports & Travel",
-        "subtitle": "Pro-grade gear"
-      }
     }
   },
   "product": {
@@ -496,6 +463,7 @@
       "settings": "Settings",
       "posts": "Blog",
       "brands": "Brands",
+      "banners": "Banners",
       "reviews": "Reviews",
       "tickets": "Support",
       "messages": "Messages",
@@ -971,6 +939,48 @@
       "reply": "Reply by email",
       "delete": "Delete",
       "deleteConfirm": "This message will be permanently deleted. Are you sure?"
+    },
+    "banners": {
+      "title": "Homepage banners",
+      "subtitle": "The hero slider and the mid-page promo banners.",
+      "new": "New banner",
+      "newTitle": "New banner",
+      "editTitle": "Edit banner",
+      "language": "Content language",
+      "placement": {
+        "hero": "Hero slider",
+        "promo": "Promo grid"
+      },
+      "state": {
+        "live": "Live",
+        "scheduled": "Scheduled",
+        "expired": "Expired",
+        "disabled": "Off"
+      },
+      "fields": {
+        "title": "Title",
+        "badge": "Small badge",
+        "subtitle": "Subtitle",
+        "cta": "Button label",
+        "placement": "Placement",
+        "theme": "Colour",
+        "href": "Destination",
+        "icon": "Icon",
+        "sortOrder": "Order",
+        "startsAt": "Starts",
+        "endsAt": "Ends",
+        "isActive": "Active"
+      },
+      "hrefHint": "An internal path, e.g. /products?category=digital - external URLs are not accepted.",
+      "scheduleHint": "Leave a date empty for no limit. An active banner with a future start appears on its own.",
+      "noIcon": "No icon",
+      "from": "From",
+      "until": "Until",
+      "enable": "Turn on",
+      "disable": "Turn off",
+      "empty": "No banners yet",
+      "emptyDesc": "Use \"New banner\" to create the first one for this placement. While there are none, this section does not appear on the homepage.",
+      "deleteConfirm": "This banner will be permanently deleted. Are you sure?"
     }
   },
   "categories": {
