@@ -14,7 +14,7 @@
 import { useTranslations, useLocale } from 'next-intl'
 import {
   Package, MapPin, Heart, MessageSquare, User as UserIcon, Shield,
-  LogOut, LayoutDashboard, ChevronLeft, Loader2, LifeBuoy,
+  LogOut, LayoutDashboard, ChevronLeft, Loader2, LifeBuoy, Bell,
 } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import type { Locale } from '@/i18n/routing'
@@ -85,6 +85,7 @@ export function AccountDashboard() {
     { href: '/account/wishlist', label: t('wishlist'), Icon: Heart },
     { href: '/account/reviews', label: t('reviewsTitle'), Icon: MessageSquare },
     { href: '/account/tickets', label: t('tickets'), Icon: LifeBuoy },
+    { href: '/account/notifications', label: t('notifications'), Icon: Bell },
     { href: '/account/profile', label: t('profile'), Icon: UserIcon },
     { href: '/account/security', label: t('security'), Icon: Shield },
   ]

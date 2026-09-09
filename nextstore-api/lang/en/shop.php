@@ -175,4 +175,8 @@ return [
     'banner_created' => 'Banner created.',
     'banner_updated' => 'Banner updated.',
     'banner_deleted' => 'Banner deleted.',
+
+    /* --- اعلان‌ها --- */
+    'notifications_all_read' => 'All notifications marked as read.',
+    'notification_deleted' => 'Notification deleted.',
 ];

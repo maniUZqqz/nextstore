@@ -370,7 +370,25 @@
     "reviewsBrowse": "دیدن محصولات",
     "reviewsCount": "{count, plural, =0 {بدون نظر} one {# نظر} other {# نظر}}",
     "reviewOn": "درباره‌ی",
-    "tickets": "تیکت‌های پشتیبانی"
+    "tickets": "تیکت‌های پشتیبانی",
+    "notifications": "اعلان‌ها"
+  },
+  "notifications": {
+    "title": "اعلان‌ها",
+    "subtitle": "خبرهای سفارش، پشتیبانی و نظرهای شما.",
+    "aria": "اعلان‌ها",
+    "ariaWithCount": "{count} اعلان خوانده‌نشده",
+    "tab": {
+      "unread": "خوانده‌نشده",
+      "all": "همه"
+    },
+    "markAllRead": "همه را خوانده‌شده کن",
+    "markRead": "خوانده‌شده",
+    "open": "مشاهده",
+    "delete": "حذف",
+    "seeAll": "دیدن همه‌ی اعلان‌ها",
+    "empty": "هنوز اعلانی نیامده است.",
+    "emptyUnread": "همه‌ی اعلان‌ها را خوانده‌اید."
   },
   "checkout": {
     "title": "تکمیل خرید",

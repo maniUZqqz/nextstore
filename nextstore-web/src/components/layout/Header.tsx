@@ -21,6 +21,7 @@ import type { Locale } from '@/i18n/routing'
 import type { Category } from '@/types/product'
 import { SearchBar } from './SearchBar'
 import { CartButton } from './CartButton'
+import { NotificationBell } from './NotificationBell'
 import { UserMenu } from './UserMenu'
 import { CategoryNav } from './CategoryNav'
 import { MobileNav } from './MobileNav'
@@ -196,6 +197,15 @@ export async function Header({ locale }: { locale: string }) {
                 مهمان   → آیکون که به صفحه ورود می‌برد
                 واردشده → آواتار با منوی کشویی
               */}
+              {/*
+                ⚠️ زنگوله پیش از منوی کاربر می‌نشیند، نه بعدش.
+
+                   اعلان چیزی است که کاربر باید *ببیند*، منوی کاربر
+                   چیزی که وقتی لازم دارد بازش می‌کند. در چیدمان
+                   راست‌به‌راست، نزدیک‌تر بودن به مرکز یعنی بیشتر دیده
+                   شدن. برای مهمان هم اصلاً رندر نمی‌شود.
+              */}
+              <NotificationBell />
               <UserMenu />
 
               {/* جداکننده قبل از سبد خرید */}

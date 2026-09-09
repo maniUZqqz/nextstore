@@ -175,4 +175,8 @@ return [
     'banner_created' => 'بنر ساخته شد.',
     'banner_updated' => 'بنر به‌روزرسانی شد.',
     'banner_deleted' => 'بنر حذف شد.',
+
+    /* --- اعلان‌ها --- */
+    'notifications_all_read' => 'همه‌ی اعلان‌ها خوانده‌شده علامت خوردند.',
+    'notification_deleted' => 'اعلان حذف شد.',
 ];

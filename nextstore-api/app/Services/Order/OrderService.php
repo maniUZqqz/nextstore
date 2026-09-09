@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Services\Cart\CartService;
 use App\Services\Cart\CouponService;
+use App\Services\Notification\NotificationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -38,6 +39,7 @@ class OrderService
     public function __construct(
         private readonly CartService $cartService,
         private readonly CouponService $coupons,
+        private readonly NotificationService $notifications,
     ) {}
 
     /**
@@ -301,7 +303,7 @@ class OrderService
             ]);
         }
 
-        return DB::transaction(function () use ($order, $target) {
+        $updated = DB::transaction(function () use ($order, $target) {
             /* ثبت زمان مرحله — برای نمایش خط زمانی سفارش به مشتری */
             $timestamps = match ($target) {
                 OrderStatus::Paid => ['paid_at' => now()],
@@ -324,6 +326,20 @@ class OrderService
 
             return $order->fresh('items');
         });
+
+        /*
+         * ⚠️ اعلان **بیرون** از تراکنش ساخته می‌شود.
+         *
+         *    اگر داخلش بود و تراکنش برمی‌گشت، اعلانی می‌ماند که از
+         *    تغییری خبر می‌دهد که هرگز رخ نداده — بدتر از نبودِ اعلان.
+         *
+         *    و اگر خودِ ساخت اعلان بشکند، سرویس اعلان آن را می‌بلعد و
+         *    فقط لاگ می‌کند؛ تغییر وضعیت سفارش نباید به‌خاطر یک عارضه‌ی
+         *    جانبی شکست بخورد.
+         */
+        $this->notifications->orderStatusChanged($updated->loadMissing('user'));
+
+        return $updated;
     }
 
     /**

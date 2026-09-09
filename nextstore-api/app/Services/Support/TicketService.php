@@ -6,6 +6,7 @@ use App\Enums\TicketStatus;
 use App\Models\Ticket;
 use App\Models\TicketMessage;
 use App\Models\User;
+use App\Services\Notification\NotificationService;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -19,6 +20,10 @@ use Illuminate\Support\Facades\DB;
  */
 class TicketService
 {
+    public function __construct(
+        private readonly NotificationService $notifications,
+    ) {}
+
     /**
      * ثبت تیکت تازه به‌همراه اولین پیام.
      *
@@ -65,7 +70,7 @@ class TicketService
      */
     public function reply(Ticket $ticket, User $sender, string $body, bool $isStaff): TicketMessage
     {
-        return DB::transaction(function () use ($ticket, $sender, $body, $isStaff) {
+        $message = DB::transaction(function () use ($ticket, $sender, $body, $isStaff) {
             $message = $ticket->messages()->create([
                 'user_id' => $sender->id,
                 /*
@@ -86,6 +91,22 @@ class TicketService
 
             return $message;
         });
+
+        /*
+         * ⚠️ فقط پاسخ **کارکنان** اعلان می‌سازد.
+         *
+         *    اگر پاسخ خود کاربر هم اعلان می‌ساخت، هر پیامی که می‌فرستاد
+         *    یک اعلان برای خودش می‌آورد — بی‌معنا، و نشان زنگوله را
+         *    برای همیشه قرمز نگه می‌داشت.
+         *
+         * ⚠️ بیرون از تراکنش: اعلانی که به پیامی اشاره کند که ذخیره
+         *    نشده، از نبودِ اعلان بدتر است.
+         */
+        if ($isStaff) {
+            $this->notifications->ticketReplied($ticket->loadMissing('user'));
+        }
+
+        return $message;
     }
 
     /** بستن گفتگو. */

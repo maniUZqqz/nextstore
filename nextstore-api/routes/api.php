@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\V1\Admin\DashboardController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Customer\AddressController;
+use App\Http\Controllers\Api\V1\Customer\NotificationController;
 use App\Http\Controllers\Api\V1\Customer\OrderController;
 use App\Http\Controllers\Api\V1\Customer\ProfileController;
 use App\Http\Controllers\Api\V1\Customer\TicketController;
@@ -268,6 +269,25 @@ Route::prefix('v1')->group(function () {
          *    وگرنه لاراول «meta» را شماره‌ی تیکت تفسیر می‌کند و درخواست
          *    به اکشن نمایش می‌رود و ۴۰۴ می‌گیرد.
          */
+        /* --- اعلان‌ها --- */
+        /*
+         * ⚠️ ترتیب اهمیت دارد: 'notifications/unread-count' و
+         *    'notifications/read-all' باید **بالاتر** از
+         *    'notifications/{notification}' بنشینند، وگرنه لاراول
+         *    «unread-count» را به‌عنوان شناسه می‌گیرد و ۴۰۴ می‌دهد.
+         */
+        Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])
+            ->name('api.notifications.unread-count');
+        Route::patch('notifications/read-all', [NotificationController::class, 'markAllRead'])
+            ->name('api.notifications.read-all');
+
+        Route::get('notifications', [NotificationController::class, 'index'])
+            ->name('api.notifications.index');
+        Route::patch('notifications/{notification}/read', [NotificationController::class, 'markRead'])
+            ->name('api.notifications.read');
+        Route::delete('notifications/{notification}', [NotificationController::class, 'destroy'])
+            ->name('api.notifications.destroy');
+
         Route::get('tickets/meta', [TicketController::class, 'meta'])->name('api.tickets.meta');
         Route::get('tickets', [TicketController::class, 'index'])->name('api.tickets.index');
         Route::post('tickets', [TicketController::class, 'store'])->name('api.tickets.store');

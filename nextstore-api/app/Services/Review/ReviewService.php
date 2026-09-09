@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
+use App\Services\Notification\NotificationService;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -20,6 +21,10 @@ use Illuminate\Support\Facades\DB;
  */
 class ReviewService
 {
+    public function __construct(
+        private readonly NotificationService $notifications,
+    ) {}
+
     /**
      * وضعیت‌هایی که یعنی کالا واقعاً به دست مشتری رسیده است.
      *
@@ -82,7 +87,7 @@ class ReviewService
      */
     public function approve(Review $review): Review
     {
-        return DB::transaction(function () use ($review) {
+        $updated = DB::transaction(function () use ($review) {
             $review->update([
                 'is_approved' => true,
                 /* دلیل رد قبلی پاک می‌شود تا وضعیت متناقض نماند */
@@ -93,6 +98,14 @@ class ReviewService
 
             return $review->fresh();
         });
+
+        /*
+         * ⚠️ بیرون از تراکنش — همان دلیل همیشگی: اعلانی که به تغییری
+         *    اشاره کند که برگشته، از نبودِ اعلان بدتر است.
+         */
+        $this->notifications->reviewApproved($updated->loadMissing(['user', 'product']));
+
+        return $updated;
     }
 
     /**
@@ -100,7 +113,7 @@ class ReviewService
      */
     public function reject(Review $review, string $reason): Review
     {
-        return DB::transaction(function () use ($review, $reason) {
+        $updated = DB::transaction(function () use ($review, $reason) {
             $review->update([
                 'is_approved' => false,
                 'rejection_reason' => $reason,
@@ -111,6 +124,14 @@ class ReviewService
 
             return $review->fresh();
         });
+
+        /* دلیل هم می‌رود: «ردشد» بدون دلیل، کاربر را به نوشتن همان نظر وامی‌دارد */
+        $this->notifications->reviewRejected(
+            $updated->loadMissing(['user', 'product']),
+            $reason,
+        );
+
+        return $updated;
     }
 
     /**

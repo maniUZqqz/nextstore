@@ -370,7 +370,25 @@
     "reviewsBrowse": "Browse products",
     "reviewsCount": "{count, plural, =0 {No reviews} one {# review} other {# reviews}}",
     "reviewOn": "On",
-    "tickets": "Support tickets"
+    "tickets": "Support tickets",
+    "notifications": "Notifications"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Updates about your orders, support tickets and reviews.",
+    "aria": "Notifications",
+    "ariaWithCount": "{count} unread notifications",
+    "tab": {
+      "unread": "Unread",
+      "all": "All"
+    },
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark as read",
+    "open": "Open",
+    "delete": "Delete",
+    "seeAll": "See all notifications",
+    "empty": "No notifications yet.",
+    "emptyUnread": "You have read every notification."
   },
   "checkout": {
     "title": "Checkout",

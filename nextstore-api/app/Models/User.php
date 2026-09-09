@@ -117,6 +117,25 @@ class User extends Authenticatable
         return $this->hasMany(Review::class);
     }
 
+    /**
+     * اعلان‌های درون‌برنامه‌ای.
+     *
+     * ⚠️ نام `notifications` عمداً همان نام رابطه‌ی تِرِیت `Notifiable`
+     *    لاراول است و **جایگزینش می‌شود**.
+     *
+     *    آن تِرِیت رابطه‌ای به جدول `notifications` پیش‌فرض لاراول
+     *    (با کلید UUID و ستون `notifiable_type`) تعریف می‌کند که این
+     *    پروژه ندارد. اگر هر دو می‌ماندند، هر فراخوانی به کوئری روی
+     *    ستون‌های ناموجود می‌رسید — خطایی که فقط در زمان اجرا و فقط
+     *    روی همان مسیر ظاهر می‌شد.
+     *
+     * @return HasMany<Notification, $this>
+     */
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
     /** @return HasMany<Wishlist, $this> */
     public function wishlists(): HasMany
     {
