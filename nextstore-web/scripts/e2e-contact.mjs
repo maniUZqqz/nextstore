@@ -15,8 +15,17 @@
  *    وگرنه صندوق با هر اجرا یک قلم زباله بیشتر می‌گیرد — همان اشتباهی
  *    که در تست نظرات رخ داد و ۷ قلم یتیم به جا گذاشت.
  *
- * ⚠️ بک‌اند سقف ۳ پیام در دقیقه روی هر IP دارد. این تست دو پیام
- *    می‌فرستد (یکی معتبر، یکی برای آزمون ۴۲۹) و همین سقف را می‌سنجد.
+ * ⚠️ بک‌اند سقف ۳ پیام در دقیقه **و ۲۰ در ساعت** روی هر IP دارد، و
+ *    این تست عمداً به سقف دقیقه‌ای می‌خورد تا پیامش را بسنجد.
+ *
+ *    سقف ساعتی یک ساعت زنده می‌ماند و بین اجراها پاک نمی‌شود: هر
+ *    اجرا حدود شش پیام می‌سوزاند، پس اجرای سوم در همان ساعت از
+ *    همان بخش «خطاهای اعتبارسنجی» می‌شکند — چون سرور ۴۲۹ می‌دهد
+ *    نه ۴۲۲ و خطایی زیر فیلدها نمی‌نشیند. سه شکست که هیچ‌کدام باگ
+ *    نیستند، و یک ساعت بعد خودبه‌خود سبز می‌شوند.
+ *
+ *    برای همین اجرا با صفر کردن شمارنده شروع می‌شود — سقف دست
+ *    نمی‌خورد، فقط داده‌ی بازمانده‌ی اجرای قبلی پاک می‌شود.
  *
  * اجرا:
  *     node scripts/e2e-contact.mjs
@@ -25,10 +34,32 @@
 import { chromium } from 'playwright-core'
 import { existsSync, readdirSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { waitUntil } from './lib/wait.mjs'
+import { execFileSync } from 'node:child_process'
 
 const BASE = process.env.SHOTS_BASE_URL ?? 'http://127.0.0.1:3100'
 const API = process.env.API_BASE_URL ?? 'http://127.0.0.1:8100'
 const OUT = '.shots'
+
+/**
+ * صفر کردن شمارنده‌ی سقف نرخ پیش از شروع.
+ *
+ * شکستش کشنده نیست: اگر PHP پرتابل جای دیگری باشد یا فرمان نباشد،
+ * تست باید اجرا شود و حداکثر به همان شکست قابل‌تشخیص برسد — نه
+ * اینکه پیش از هر بررسی‌ای بمیرد.
+ */
+function resetRateLimits() {
+  const php = join('..', 'tools', 'php', 'php.exe')
+  const api = join('..', 'nextstore-api')
+
+  try {
+    execFileSync(php, ['artisan', 'e2e:reset-limits'], { cwd: api, stdio: 'pipe' })
+    console.log('  (شمارنده‌ی سقف نرخ صفر شد)')
+  } catch (error) {
+    console.log('  (صفر کردن سقف نرخ ممکن نشد — ' + String(error.message).slice(0, 90) + ')')
+  }
+}
+resetRateLimits()
 
 /** نشانه‌ای که فقط این اجرا می‌سازد — برای پیدا کردن و حذف پیام خودمان. */
 const STAMP = `e2e-${Date.now()}`
@@ -320,7 +351,22 @@ console.log('--- 6. the admin inbox ---')
 console.log('--- 7. opening marks it read ---')
 {
   await page.locator('main ul > li button[aria-expanded]').first().click()
-  await page.waitForTimeout(2500)
+
+  /*
+   * ⚠️ انتظار تا **بدنه** برسد، نه یک زمان ثابت.
+   *
+   *    باز شدن کارت فوری است ولی متن پیام با یک درخواست دوم
+   *    می‌آید و تا رسیدنش اسکلتون نشان داده می‌شود. با زمان ثابت،
+   *    بررسی گاهی همان اسکلتون را می‌خواند و «متن پیام نیست»
+   *    گزارش می‌دهد — در حالی که یک ثانیه بعد آنجاست.
+   *
+   *    لینک mailto فقط کنار بدنه رندر می‌شود، پس نشانه‌ی خوبی
+   *    برای «رسید» است.
+   */
+  await waitUntil(
+    () => page.locator('main a[href^="mailto:"]').count(),
+    (count) => count > 0,
+  )
 
   const expanded = await page
     .locator('main ul > li button[aria-expanded="true"]')

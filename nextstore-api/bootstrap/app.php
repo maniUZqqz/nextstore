@@ -16,6 +16,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Exceptions\InvalidSignatureException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -149,6 +150,28 @@ return Application::configure(basePath: dirname(__DIR__))
                 'message' => __('errors.unauthenticated'),
                 'error' => ['code' => 'UNAUTHENTICATED'],
             ], 401);
+        });
+
+        /*
+         * پیوند امضاشده‌ی نامعتبر یا منقضی.
+         *
+         * ⚠️ بدون این، پیام خامِ انگلیسی لاراول («Invalid signature.»)
+         *    وسط صفحه‌ی فارسی می‌نشست — همان تله‌ای که یک بار با پسوند
+         *    «(and N more errors)» در خطاهای اعتبارسنجی خوردیم.
+         *
+         *    این استثنا فقط در جریان تأیید ایمیل رخ می‌دهد و کاربری که
+         *    می‌بیندش معمولاً پیوند قدیمی را باز کرده؛ پیام باید بگوید
+         *    چه کند، نه اینکه اصطلاح فنی نشان دهد.
+         */
+        $exceptions->render(function (InvalidSignatureException $e, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
+            return response()->json([
+                'message' => __('auth.email_verification_invalid'),
+                'error' => ['code' => 'INVALID_SIGNATURE'],
+            ], 403);
         });
 
         /** منبع یافت نشد */

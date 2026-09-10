@@ -18,6 +18,7 @@
 import { chromium } from 'playwright-core'
 import { existsSync, readdirSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { waitUntil } from './lib/wait.mjs'
 
 const BASE = process.env.SHOTS_BASE_URL ?? 'http://127.0.0.1:3100'
 const API = process.env.API_BASE_URL ?? 'http://127.0.0.1:8100/api/v1'
@@ -176,10 +177,22 @@ console.log('--- 1. list page ---')
 console.log('--- 2. all tab ---')
 {
   await page.locator('[role="tab"]').nth(3).click()
-  await page.waitForTimeout(1200)
 
-  const cardCount = await cards().count()
   const expectedAll = before.pending + before.approved + before.rejected
+
+  /*
+   * ⚠️ انتظار تا فهرست واقعاً عوض شود.
+   *
+   *    نشان تب فوراً درست می‌شود چون از کوئری شمارش‌ها می‌آید، ولی
+   *    کارت‌ها تا پایان واکشیِ فیلتر تازه همان کارت‌های «در انتظار»
+   *    می‌مانند. زمان ثابت ۱۲۰۰ms برای ۲۲۴ نظر کافی نبود و بررسی
+   *    «تب همه بیشتر از در‌انتظار نشان می‌دهد» شکست می‌خورد، در
+   *    حالی که فیلتر درست کار می‌کرد.
+   */
+  const cardCount = await waitUntil(
+    () => cards().count(),
+    (count) => count > before.pending || expectedAll <= before.pending,
+  )
 
   /*
    * صفحه‌بندی ۲۰تایی است، پس اگر کل نظرات بیشتر باشد فقط ۲۰ کارت

@@ -26,8 +26,7 @@ import { Link } from '@/i18n/navigation'
 import type { Locale } from '@/i18n/routing'
 import { getHomeData } from '@/lib/api/catalog'
 import { getBanners } from '@/lib/api/banners'
-import { getSiteSettings } from '@/lib/api/settings'
-import { formatPrice, currencyLabel } from '@/lib/utils/format'
+import { getSiteSettings, freeShippingValues } from '@/lib/api/settings'
 import type { HomeData } from '@/types/product'
 import { HeroSlider } from '@/components/home/HeroSlider'
 import { CategoryCircles } from '@/components/home/CategoryCircles'
@@ -77,10 +76,7 @@ export default async function HomePage({
    *    اینجا هم دستی در فایل ترجمه نوشته شده بود.
    */
   const settings = await getSiteSettings(locale)
-  const freeShipping = {
-    amount: formatPrice(settings.shipping.freeThreshold, locale as Locale),
-    currency: currencyLabel(locale as Locale),
-  }
+  const freeShipping = freeShippingValues(settings, locale as Locale)
 
   /** نوار خدمات فروشگاه. */
   const features = [

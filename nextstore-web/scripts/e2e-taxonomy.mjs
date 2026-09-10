@@ -238,6 +238,24 @@ console.log('\n--- 4. edit keeps the other language ---')
   check('english NOT wiped', detail.data?.name?.en === `E2E Category ${STAMP}`, detail.data?.name?.en)
 }
 
+/**
+ * متن ردیف اولِ ریشه‌ها را می‌خواند تا وقتی با مقدار پیشین فرق کند.
+ *
+ * اگر تا مهلت عوض نشد، همان مقدار پیشین برگردانده می‌شود تا بررسی
+ * به‌درستی شکست بخورد — نه اینکه با استثنا کل سوئیت را بیندازد.
+ */
+async function firstRootUntilChanged(previous, timeout = 15000) {
+  const deadline = Date.now() + timeout
+
+  while (Date.now() < deadline) {
+    const current = await page.locator('main li[data-depth="0"]').first().innerText()
+    if (current !== previous) return current
+    await page.waitForTimeout(250)
+  }
+
+  return previous
+}
+
 /* ============ 5. جابه‌جایی ترتیب ============ */
 console.log('\n--- 5. reorder ---')
 {
@@ -256,9 +274,18 @@ console.log('\n--- 5. reorder ---')
 
   /* دومین *ریشه* را یک پله بالا می‌بریم */
   await roots.nth(1).getByRole('button', { name: 'انتقال به بالا' }).click()
-  await page.waitForTimeout(2500)
 
-  const after = await page.locator('main li[data-depth="0"]').first().innerText()
+  /*
+   * ⚠️ انتظار **شرطی**، نه زمان ثابت.
+   *
+   *    زنجیره‌ی «درخواست ذخیره → invalidate → واکشی دوباره → رندر»
+   *    روی ماشین کند از ۲۵۰۰ms هم رد می‌شود. نسخه‌ی قبلی زمان ثابت
+   *    می‌گذاشت و نتیجه‌اش شکستِ گمراه‌کننده‌ی «ردیف اول عوض نشد» بود
+   *    در حالی که سرور ذخیره کرده بود — بررسی بعدی که رفرش می‌کرد
+   *    ترتیب تازه را می‌دید و آن هم شکست می‌خورد، چون با مقدار کهنه
+   *    مقایسه می‌شد. یک تأخیر، دو شکستِ دروغین.
+   */
+  const after = await firstRootUntilChanged(before)
   check('first row changed', after !== before, `${before.split('\n')[0]} → ${after.split('\n')[0]}`)
 
   /* و پس از رفرش هم باید همان بماند — یعنی واقعاً ذخیره شده */

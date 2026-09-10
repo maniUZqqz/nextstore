@@ -60,6 +60,92 @@ function freeSpaceMb() {
 const MIN_FREE_MB = 500
 
 
+/* =========================================================================
+ * بررسی سلامت پیش از شروع
+ * ====================================================================== */
+
+/**
+ * چند مسیر نماینده که باید ۲۰۰ بدهند.
+ *
+ * ⚠️ چرا این بررسی وجود دارد؟
+ *
+ *    یک بار همه‌ی صفحه‌های «دسته‌ی وبلاگ» ۴۰۴ می‌دادند و دو سوئیت با
+ *    شکست‌های عجیب افتادند: «دسته پستی ندارد» و «تایم‌اوت در بازکردن
+ *    صفحه‌ی محصول». ساعت‌ها دنبال باگ در کد گشتیم و کد سالم بود —
+ *    ماژول کامپایل‌شده در حافظه‌ی دِو سرور خراب شده بود (بازمانده‌ی
+ *    دوره‌ای که درایو پر شد). یک ذخیره‌ی دوباره‌ی همان فایل، مسئله را
+ *    حل کرد.
+ *
+ *    شکستِ ناشی از سرورِ کهنه دقیقاً شبیه باگ محصول به نظر می‌رسد. اگر
+ *    همان اول معلوم شود، به‌جای بیست دقیقه اجرا و نُه شکستِ گیج‌کننده،
+ *    یک پیام روشن می‌گیری: سرور را دوباره راه‌اندازی کن.
+ *
+ *    فهرست عمداً کوتاه است — چند صفحه از جنس‌های مختلف (ایستا، پویا،
+ *    با پارامتر مسیر) که بیشترِ درخت رندر را لمس می‌کنند.
+ */
+const SMOKE_PATHS = [
+  '/fa',
+  '/fa/products',
+  '/fa/blog',
+  '/fa/blog/category/buying-guides',
+  '/fa/contact',
+  '/en',
+]
+
+const WEB = process.env.SHOTS_BASE_URL ?? 'http://127.0.0.1:3100'
+const API_ROOT = process.env.API_BASE_URL ?? 'http://127.0.0.1:8100/api/v1'
+
+async function smokeTest() {
+  console.log('بررسی سلامت سرورها…')
+
+  /** پیام یکسان هر دو حالت: چه API نباشد، چه خطا بدهد. */
+  function apiIsDown(detail) {
+    console.error()
+    console.error('❌ ' + detail)
+    console.error('   اجرا کن:  scripts/run.ps1')
+    console.error()
+    process.exit(1)
+  }
+
+  /* بک‌اند اول: اگر این نباشد، همه‌ی صفحه‌ها هم می‌افتند */
+  try {
+    const api = await fetch(API_ROOT + '/settings', { headers: { Accept: 'application/json' } })
+    if (!api.ok) apiIsDown(`API پاسخ ${api.status} داد — لاراول بالا نیست یا خطا می‌دهد.`)
+  } catch {
+    apiIsDown('اتصال به API برقرار نشد — لاراول روی ' + API_ROOT + ' بالا نیست.')
+  }
+
+  const broken = []
+
+  for (const path of SMOKE_PATHS) {
+    try {
+      const response = await fetch(WEB + path, { redirect: 'follow' })
+      if (!response.ok) broken.push(`${path} → ${response.status}`)
+    } catch (error) {
+      broken.push(`${path} → ${String(error.message).slice(0, 60)}`)
+    }
+  }
+
+  if (broken.length > 0) {
+    console.error()
+    console.error('❌ این صفحه‌ها پیش از شروع تست هم سالم نیستند:')
+    console.error()
+    for (const line of broken) console.error('    ' + line)
+    console.error()
+    console.error('  این معمولاً باگ کد نیست — سرور Next کهنه است.')
+    console.error('  دوباره راه‌اندازی‌اش کن و بعد تست‌ها را بزن:')
+    console.error('      scripts/run.ps1 -Stop')
+    console.error('      scripts/run.ps1')
+    console.error()
+    process.exit(1)
+  }
+
+  console.log(`  ✓ ${SMOKE_PATHS.length} صفحه‌ی نماینده سالم‌اند`)
+  console.log()
+}
+
+await smokeTest()
+
 /** فیلتر اختیاری از خط فرمان. */
 const filter = process.argv[2]
 

@@ -12,8 +12,8 @@
  */
 
 import { getTranslations } from 'next-intl/server'
-import { getSiteSettings } from '@/lib/api/settings'
-import { toAsciiDigits, formatPrice, currencyLabel } from '@/lib/utils/format'
+import { getSiteSettings, freeShippingValues } from '@/lib/api/settings'
+import { toAsciiDigits } from '@/lib/utils/format'
 import { Phone, Truck, PackageSearch, Heart } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { getCategories } from '@/lib/api/catalog'
@@ -65,10 +65,7 @@ export async function Header({ locale }: { locale: string }) {
    *    که با نرخ تبدیل خود پروژه حدود ۸ دلار می‌شود — یعنی سایت
    *    انگلیسی شش برابر اشتباه وعده می‌داد.
    */
-  const freeShipping = {
-    amount: formatPrice(settings.shipping.freeThreshold, locale as Locale),
-    currency: currencyLabel(locale as Locale),
-  }
+  const freeShipping = freeShippingValues(settings, locale as Locale)
 
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md">

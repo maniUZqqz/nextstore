@@ -28,4 +28,10 @@ return [
     'email_invalid' => 'That email is not valid.',
     'password_required' => 'Please enter a password.',
     'password_mismatch' => 'The two passwords do not match.',
+
+    /* --- Email verification --- */
+    'email_verification_sent' => 'Verification email sent. Check your inbox (and spam folder).',
+    'email_verified' => 'Your email has been verified.',
+    'email_already_verified' => 'Your email is already verified.',
+    'email_verification_invalid' => 'This verification link is invalid or has expired. Request a new one from your profile.',
 ];

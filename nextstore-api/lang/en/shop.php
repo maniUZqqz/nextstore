@@ -166,6 +166,12 @@ return [
     'contact_sent' => 'Your message has been received. We will reply soon.',
     'contact_deleted' => 'Message deleted.',
 
+    /* --- Newsletter --- */
+    'newsletter_email_required' => 'Please enter your email.',
+    'newsletter_email_invalid' => 'That email address is not valid.',
+    'newsletter_subscribed' => 'You are subscribed to the newsletter.',
+    'newsletter_unsubscribed' => 'You have been unsubscribed. We will not email you again.',
+
     /* --- بنرها --- */
     'banner_title_required' => 'A Persian title is required.',
     'banner_href_required' => 'Please enter the banner destination.',

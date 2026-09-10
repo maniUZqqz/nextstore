@@ -14,6 +14,8 @@
 import { api } from './client'
 import type { ApiResponse } from '@/types/api'
 import type { SiteSettings } from '@/types/settings'
+import type { Locale } from '@/i18n/routing'
+import { formatPrice, currencyLabel } from '@/lib/utils/format'
 
 /** تنظیمات خالی — وقتی API در دسترس نیست. */
 const EMPTY: SiteSettings = {
@@ -55,5 +57,29 @@ export async function getSiteSettings(locale: string): Promise<SiteSettings> {
     return { ...EMPTY, ...response.data }
   } catch {
     return EMPTY
+  }
+}
+
+/**
+ * پارامترهای متن «ارسال رایگان بالای …» — آماده برای next-intl.
+ *
+ * ⚠️ چرا تابع مشترک و نه ساختن دستی در هر صفحه؟
+ *
+ *    این شیء در سه جا لازم است: نوار بالای هدر، نوار خدمات صفحه‌ی
+ *    اصلی، و تضمین‌های خرید در صفحه‌ی محصول. دو جای اول خودشان
+ *    می‌ساختندش و صفحه‌ی محصول اصلاً نمی‌ساخت — یعنی همان کلید ترجمه
+ *    را **بدون پارامتر** صدا می‌زد.
+ *
+ *    نتیجه‌اش سکوت نبود: next-intl خطای FORMATTING_ERROR می‌داد
+ *    («متغیر amount داده نشد») و در صفحه‌ی هر محصول یک خطای کنسول
+ *    می‌نشست. متن هم به‌جای عدد، خودِ «{amount}» را نشان می‌داد.
+ *
+ *    حالا هر جا این متن را می‌خواهد، همین را صدا می‌زند و جا انداختنِ
+ *    پارامتر ممکن نیست.
+ */
+export function freeShippingValues(settings: SiteSettings, locale: Locale) {
+  return {
+    amount: formatPrice(settings.shipping.freeThreshold, locale),
+    currency: currencyLabel(locale),
   }
 }

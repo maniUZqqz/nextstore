@@ -33,8 +33,18 @@ const OUT = '.shots'
  *    رمزش به حالت اولیه برمی‌گردد.
  */
 const TEST_EMAIL = 'e2e-profile@example.test'
+const BASELINE_NAME = 'کاربر تست فرانت'
 const FIRST_PASSWORD = 'Kp9-e2e-fixture-dR'
 const SECOND_PASSWORD = 'Wm5-e2e-fixture-zQ'
+
+/*
+ * ستون `phone` در دیتابیس unique است، پس شماره هم مثل ایمیل باید
+ * ثابت و کنارگذاشته باشد نه ساخته‌شده با Date.now(): قاعده‌ی
+ * اعتبارسنجی همین حساب را ignore می‌کند، پس ذخیره‌ی دوباره‌ی همان
+ * مقدار مشکلی ندارد. پیش‌شماره‌ی ۰۹۹۹ عمدی است — سیدرها ۰۹۱۲
+ * می‌دهند و این‌طور هیچ‌وقت با داده‌ی نمونه برخورد نمی‌کند.
+ */
+const TEST_PHONE = '09990000001'
 
 let pass = 0, fail = 0
 const check = (label, ok, extra = '') => {
@@ -95,6 +105,30 @@ const call = (token, path, options = {}) =>
  *                           مانده؛ رمز بازنشانی می‌شود تا این اجرا
  *                           از نقطه‌ی درست شروع کند.
  */
+/**
+ * برگرداندن نام و شماره به حالت پایه.
+ *
+ * ⚠️ بدون این، سوئیت فقط **یک بار** سبز می‌شد.
+ *
+ *    بخش ۳ نام را به «نام ویرایش‌شده» تغییر می‌دهد و هیچ‌جا
+ *    برنمی‌گرداند. اجرای بعدی در همان بررسی اول می‌شکست («نام از
+ *    پیش پر شده») — شکستی که شبیه باگ صفحه‌ی پروفایل است، نه شبیه
+ *    بازمانده‌ی اجرای قبلی.
+ *
+ *    `prepareFixture` فقط رمز را تضمین می‌کرد؛ نام و شماره هم
+ *    بخشی از همان حالت پایه‌اند.
+ */
+async function resetProfileFields(authToken) {
+  const response = await call(authToken, '/profile', {
+    method: 'PUT',
+    body: JSON.stringify({ name: BASELINE_NAME, email: TEST_EMAIL, phone: null }),
+  })
+
+  if (response.status !== 200) {
+    throw new Error('بازنشانی پروفایل فیکسچر شکست خورد: ' + response.status)
+  }
+}
+
 async function prepareFixture() {
   const first = await authRequest('/auth/login', { email: TEST_EMAIL, password: FIRST_PASSWORD })
   if (first.body?.data?.token) return first.body.data.token
@@ -119,7 +153,7 @@ async function prepareFixture() {
   }
 
   const registered = await authRequest('/auth/register', {
-    name: 'کاربر تست فرانت',
+    name: BASELINE_NAME,
     email: TEST_EMAIL,
     password: FIRST_PASSWORD,
     password_confirmation: FIRST_PASSWORD,
@@ -132,6 +166,7 @@ async function prepareFixture() {
 }
 
 let token = await prepareFixture()
+await resetProfileFields(token)
 console.log(`کاربر آزمایشی: ${TEST_EMAIL}\n`)
 
 const browser = await chromium.launch({ executablePath: findChromium() })
@@ -166,7 +201,7 @@ console.log('--- 1. profile page ---')
   await page.goto(BASE + '/fa/account/profile', { waitUntil: 'networkidle', timeout: 45000 })
   await page.waitForSelector('main input[name="name"]', { timeout: 15000 })
 
-  check('name prefilled', (await page.inputValue('main input[name="name"]')) === 'کاربر تست فرانت')
+  check('name prefilled', (await page.inputValue('main input[name="name"]')) === BASELINE_NAME)
   check('email prefilled', (await page.inputValue('main input[name="email"]')) === TEST_EMAIL)
 
   /* کاربر تازه ایمیل تأییدنشده دارد — نشان باید همین را بگوید */
@@ -202,17 +237,15 @@ console.log('\n--- 2. profile validation ---')
 /* ============ 3. ذخیره‌ی موفق ============ */
 console.log('\n--- 3. profile save ---')
 {
-  const phone = '09' + String(STAMP).slice(-9)
-
   await page.fill('main input[name="name"]', 'نام ویرایش‌شده')
   await page.fill('main input[name="email"]', TEST_EMAIL)
-  await page.fill('main input[name="phone"]', phone)
+  await page.fill('main input[name="phone"]', TEST_PHONE)
   await page.locator('main form button[type="submit"]').click()
   await page.waitForTimeout(2500)
 
   const profile = await (await call(token, '/profile')).json()
   check('name saved', profile.data?.name === 'نام ویرایش‌شده', profile.data?.name)
-  check('phone saved', profile.data?.phone === phone, profile.data?.phone)
+  check('phone saved', profile.data?.phone === TEST_PHONE, profile.data?.phone)
 
   /*
    * نام در هدر هم باید عوض شده باشد — کش کاربر به‌روز می‌شود.

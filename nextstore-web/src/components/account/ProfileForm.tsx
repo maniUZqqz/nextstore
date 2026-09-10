@@ -19,6 +19,7 @@ import { Loader2, Save, AlertCircle, BadgeCheck, CircleAlert } from 'lucide-reac
 import type { Locale } from '@/i18n/routing'
 import * as profileApi from '@/lib/api/profile'
 import { ApiError } from '@/lib/api/client'
+import { resendVerificationEmail } from '@/lib/api/auth'
 import { AUTH_QUERY_KEY } from '@/hooks/useAuth'
 import { FormField } from '@/components/auth/FormField'
 import { formatDate } from '@/lib/utils/format'
@@ -157,8 +158,14 @@ function ProfileFields({ user }: { user: User }) {
           </div>
 
           <div>
-            <div className="mb-1.5 flex items-center gap-2">
+            <div className="mb-1.5 flex flex-wrap items-center gap-2">
               <VerifiedBadge verified={user.emailVerified} />
+              {/*
+                ⚠️ بدون این دکمه، نشان «تأییدنشده» یک بن‌بست بود:
+                   کاربر هشداری دائمی می‌دید که هیچ کاری از دستش
+                   برنمی‌آمد.
+              */}
+              {!user.emailVerified && <ResendVerification />}
             </div>
             <FormField
               label={t('email')}
@@ -228,6 +235,44 @@ function ProfileFields({ user }: { user: User }) {
  *    می‌بیند و کل زیردرخت را دور می‌ریزد و از نو می‌سازد — که هم
  *    کند است و هم وضعیت داخلی را از بین می‌برد.
  */
+/**
+ * دکمه‌ی درخواست دوباره‌ی ایمیل تأیید.
+ *
+ * ⚠️ پس از ارسال، دکمه جای خودش را به پیام می‌دهد و برنمی‌گردد.
+ *
+ *    اگر می‌ماند، کاربری که ایمیل را در صندوقش نمی‌بیند چند بار پشت
+ *    هم می‌زد و به سقف نرخ می‌خورد — و آن خطا بدتر گیجش می‌کرد.
+ */
+function ResendVerification() {
+  const t = useTranslations('profile')
+  const locale = useLocale()
+
+  const mutation = useMutation({
+    mutationFn: () => resendVerificationEmail(locale),
+    onSuccess: (response) => toast.success(response.message),
+    onError: (error) =>
+      toast.error(error instanceof ApiError ? error.message : t('verifyFailed')),
+  })
+
+  if (mutation.isSuccess) {
+    return (
+      <span className="text-[11px] text-muted-foreground">{t('verifySent')}</span>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => mutation.mutate()}
+      disabled={mutation.isPending}
+      className="inline-flex items-center gap-1 text-[11px] font-medium text-primary underline-offset-2 hover:underline disabled:opacity-50"
+    >
+      {mutation.isPending && <Loader2 className="size-3 animate-spin" aria-hidden="true" />}
+      {t('verifyResend')}
+    </button>
+  )
+}
+
 function VerifiedBadge({ verified }: { verified: boolean }) {
   const t = useTranslations('profile')
 

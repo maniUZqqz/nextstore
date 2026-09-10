@@ -136,3 +136,27 @@ export async function resetPassword(
 ) {
   return api.post<{ message: string }>('/auth/reset-password', input, { locale })
 }
+
+/**
+ * درخواست ارسال دوباره‌ی ایمیل تأیید.
+ *
+ * ⚠️ برخلاف بازیابی رمز، اینجا پنهان‌کاری لازم نیست: کاربر وارد شده و
+ *    درباره‌ی حساب خودش می‌پرسد، پس پاسخ متفاوت برای «تأییدشده» چیزی
+ *    درباره‌ی دیگران لو نمی‌دهد.
+ */
+export async function resendVerificationEmail(locale?: string) {
+  return api.post<{ message: string }>('/auth/email/resend', undefined, { locale })
+}
+
+/**
+ * تأیید ایمیل با مسیر امضاشده‌ای که در پیوند آمده.
+ *
+ * ⚠️ `path` **بی‌کم‌وکاست** پس فرستاده می‌شود.
+ *
+ *    امضا روی همان رشته ساخته شده؛ هر دست‌کاری — حتی مرتب‌کردن دوباره‌ی
+ *    پارامترها — باطلش می‌کند. برای همین اینجا چیزی از آن جدا یا
+ *    بازسازی نمی‌شود.
+ */
+export async function verifyEmail(path: string, locale?: string) {
+  return api.get<{ message: string }>(path.replace(/^\/api\/v1/, ''), { locale })
+}

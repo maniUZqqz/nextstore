@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminSettingController;
 use App\Http\Controllers\Api\V1\Admin\AdminTicketController;
 use App\Http\Controllers\Api\V1\Admin\DashboardController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Customer\AddressController;
 use App\Http\Controllers\Api\V1\Customer\NotificationController;
@@ -40,6 +41,7 @@ use App\Http\Controllers\Api\V1\Shop\BlogController;
 use App\Http\Controllers\Api\V1\Shop\CartController;
 use App\Http\Controllers\Api\V1\Shop\CatalogController;
 use App\Http\Controllers\Api\V1\Shop\ContactController;
+use App\Http\Controllers\Api\V1\Shop\NewsletterController;
 use App\Http\Controllers\Api\V1\Shop\PaymentController;
 use App\Http\Controllers\Api\V1\Shop\ProductController;
 use App\Http\Controllers\Api\V1\Shop\ReviewController;
@@ -155,6 +157,27 @@ Route::prefix('v1')->group(function () {
         ->middleware('throttle:contact')
         ->name('api.contact.store');
 
+    /*
+     * خبرنامه.
+     *
+     * ⚠️ همان `throttle:contact` را می‌گیرد، نه سقفی جداگانه.
+     *
+     *    هر دو فرم عمومی‌اند، هر دو در دیتابیس می‌نویسند و هر دو
+     *    یک جنس سوءاستفاده را جذب می‌کنند: ربات ثبت‌نام انبوه.
+     *    سقف مشترک یعنی مهاجم نمی‌تواند با جابه‌جا شدن بین دو
+     *    فرم، سهمیه‌اش را دو برابر کند.
+     *
+     * ⚠️ لغو عضویت سقف سخت‌گیرانه ندارد و در گروه `api` می‌ماند:
+     *    کسی که می‌خواهد از فهرست بیرون برود نباید پشت سقف نرخ
+     *    گیر کند، و توکن ۶۴ نویسه‌ای حدس‌زدنی نیست.
+     */
+    Route::post('newsletter', [NewsletterController::class, 'subscribe'])
+        ->middleware('throttle:contact')
+        ->name('api.newsletter.subscribe');
+
+    Route::delete('newsletter/{token}', [NewsletterController::class, 'unsubscribe'])
+        ->name('api.newsletter.unsubscribe');
+
     /** بررسی سلامت سرویس — برای مانیتورینگ */
     Route::get('health', fn () => response()->json([
         'status' => 'ok',
@@ -194,6 +217,35 @@ Route::prefix('v1')->group(function () {
         Route::post('reset-password', [PasswordResetController::class, 'reset'])
             ->middleware('throttle:password-reset')
             ->name('api.auth.reset-password');
+
+        /*
+         * تأیید ایمیل با پیوند امضاشده.
+         *
+         * ⚠️ بدون `auth:sanctum` — کاربر ممکن است لینک را در
+         *    مرورگر دیگری باز کند که آنجا وارد نشده. امضای موقت
+         *    خودش هویت را تضمین می‌کند.
+         *
+         * ⚠️ `signed` الزامی است. بدون آن هر کسی با حدس‌زدن شناسه
+         *    می‌توانست ایمیل دیگران را «تأیید» کند.
+         *
+         * ⚠️ `signed:relative` و نه `signed` خالی.
+         *
+         *    اعلان، پیوند را **نسبی** امضا می‌کند تا به دامنه‌ی API
+         *    وابسته نباشد؛ فرانت همان مسیر را به هر پایه‌ای که
+         *    می‌شناسد پس می‌دهد. حالت پیش‌فرض میان‌افزار، نشانی
+         *    *مطلق* را می‌سنجد و همه‌ی پیوندها «امضای نامعتبر»
+         *    می‌گرفتند — چیزی که تست اولیه هم نگرفت، چون خودش
+         *    پیوند را مطلق می‌ساخت به‌جای اینکه از خود اعلان
+         *    بگیرد.
+         */
+        Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+            ->middleware('signed:relative')
+            ->name('api.auth.email.verify');
+
+        /* ارسال دوباره — نیازمند ورود، چون درباره‌ی حساب خودِ کاربر است */
+        Route::post('email/resend', [EmailVerificationController::class, 'resend'])
+            ->middleware(['auth:sanctum', 'throttle:password-forgot'])
+            ->name('api.auth.email.resend');
 
         /* مسیرهای نیازمند توکن معتبر */
         Route::middleware('auth:sanctum')->group(function () {

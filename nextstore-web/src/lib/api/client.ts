@@ -176,7 +176,32 @@ export async function apiRequest<T>(
     return undefined as T
   }
 
-  return response.json() as Promise<T>
+  /*
+   * ⚠️ پاسخ ۲۰۰ با بدنه‌ی خالی هم ممکن است.
+   *
+   *    `php artisan serve` سرور توکار PHP است و تک‌رشته‌ای: وقتی
+   *    چند درخواست هم‌زمان می‌رسد، گاهی وضعیت ۲۰۰ می‌دهد و بدنه
+   *    را خالی می‌فرستد. بدون این محافظ، `response.json()` یک
+   *    SyntaxError مهارنشده پرتاب می‌کند که هیچ‌کدام از فراخوان‌ها
+   *    انتظارش را ندارند — آن‌ها `ApiError` را می‌گیرند — و کل صفحه
+   *    می‌افتد. در لاگ هم فقط «Unexpected end of JSON input» دیده
+   *    می‌شود که هیچ نمی‌گوید کدام درخواست بوده.
+   *
+   *    این در محیط توسعه رخ می‌دهد نه تولید (آنجا nginx و php-fpm
+   *    است)، ولی هزینه‌ی محافظ ناچیز است و خطا را به همان
+   *    `ApiError`ی تبدیل می‌کند که بقیه‌ی کد بلد است مدیریتش کند.
+   */
+  const text = await response.text()
+
+  if (text.trim() === '') {
+    throw new ApiError('EMPTY_RESPONSE', 'پاسخ سرور خالی بود', response.status)
+  }
+
+  try {
+    return JSON.parse(text) as T
+  } catch {
+    throw new ApiError('INVALID_JSON', 'پاسخ سرور قابل خواندن نبود', response.status)
+  }
 }
 
 /** میان‌برهای متدهای HTTP برای خوانایی بیشتر در لایه‌ی سرویس. */

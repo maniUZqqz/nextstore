@@ -20,6 +20,7 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
+    "page": "Page {page} of {total}",
     "viewAll": "View all",
     "showMore": "Show more",
     "seeDetails": "See details",
@@ -213,7 +214,8 @@
       "desc": "Enter your email to get the latest offers",
       "placeholder": "Email address",
       "submit": "Subscribe",
-      "success": "You're subscribed"
+      "tooMany": "Too many requests in a row. Wait a minute and try again.",
+      "failed": "Could not subscribe. Please try again."
     },
     "links": {
       "aboutUs": "About us",
@@ -333,6 +335,14 @@
       "goToLogin": "Go to sign in",
       "tooMany": "Too many requests in a row. Wait a minute.",
       "failed": "The password could not be saved. Check your connection."
+    },
+    "verifyEmail": {
+      "title": "Email verification",
+      "checking": "Checking the link…",
+      "failed": "Verification failed. The link may have expired.",
+      "missingLink": "The link is incomplete. Request a new one from your profile.",
+      "goToAccount": "Go to my account",
+      "goToProfile": "Go to my profile"
     }
   },
   "account": {
@@ -660,7 +670,6 @@
     "accessDenied": "Access denied",
     "accessDeniedDesc": "This section is available to store administrators only",
     "results": "{count} items",
-    "page": "Page {page} of {total}",
     "reset": "Clear filters",
     "backToList": "Back to list",
     "saving": "Saving…",
@@ -1223,7 +1232,10 @@
     "unverified": "Not verified",
     "verifyHint": "Changing your email or phone clears its verification",
     "memberSince": "Member since {date}",
-    "roleLabel": "Role"
+    "roleLabel": "Role",
+    "verifyResend": "Resend verification email",
+    "verifySent": "Verification email sent",
+    "verifyFailed": "Could not send the verification email."
   },
   "security": {
     "title": "Account security",

@@ -3,43 +3,84 @@
 /**
  * فرم عضویت در خبرنامه
  * ---------------------------------------------------------------------------
- * فعلاً فقط سمت کلاینت اعتبارسنجی و تأیید می‌کند. پس از پیاده‌سازی
- * اندپوینت `/newsletter` در بک‌اند، تابع ارسال به آن وصل می‌شود.
+ * ⚠️ این فرم پیش‌تر **ساختگی** بود.
  *
- * نکته دسترسی‌پذیری: پیام موفقیت با aria-live اعلام می‌شود تا
- * کاربر صفحه‌خوان هم از ثبت شدن باخبر شود.
+ *    نسخه‌ی اول یک `setTimeout` می‌گذاشت، «با موفقیت عضو شدید» نشان
+ *    می‌داد و ایمیل را دور می‌ریخت. از بیرون هیچ فرقی با فرم واقعی
+ *    نداشت — همان اشتباهی که یک بار در فرم تماس هم رخ داده بود. حالا
+ *    به `POST /newsletter` وصل است.
+ *
+ * ⚠️ پیام موفقیت از **سرور** می‌آید، نه از فایل ترجمه.
+ *
+ *    بک‌اند برای «تازه ثبت شد» و «از قبل عضو بود» عمداً یک پاسخ
+ *    می‌دهد تا نشود با امتحان‌کردن ایمیل‌ها فهمید چه کسانی مشترک‌اند.
+ *    اگر فرانت متن خودش را نشان می‌داد، همان تصمیم امنیتی بی‌اثر
+ *    می‌شد چون باید بین دو حالت فرق می‌گذاشت.
+ *
+ * نکته دسترسی‌پذیری: پیام موفقیت و خطا هر دو با aria-live اعلام
+ * می‌شوند تا کاربر صفحه‌خوان هم از نتیجه باخبر شود.
  */
 
 import { useState, type FormEvent } from 'react'
-import { useTranslations } from 'next-intl'
-import { Check, Loader2 } from 'lucide-react'
+import { useTranslations, useLocale } from 'next-intl'
+import { useMutation } from '@tanstack/react-query'
+import { Check, Loader2, AlertCircle } from 'lucide-react'
+import { subscribeToNewsletter } from '@/lib/api/newsletter'
+import { ApiError } from '@/lib/api/client'
 import { cn } from '@/lib/utils/cn'
 
 export function NewsletterForm({ className }: { className?: string }) {
   const t = useTranslations('footer.newsletter')
+  const locale = useLocale()
 
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle')
+  const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null)
 
-  /** ارسال فرم و نمایش بازخورد. */
-  const handleSubmit = async (e: FormEvent) => {
+  const mutation = useMutation({
+    mutationFn: (value: string) => subscribeToNewsletter(value, locale),
+
+    onSuccess: (response) => {
+      setMessage({ kind: 'success', text: response.message })
+      setEmail('')
+    },
+
+    onError: (error) => {
+      if (error instanceof ApiError) {
+        /*
+         * ⚠️ ۴۲۹ پیام مخصوص خودش دارد — همان قاعده‌ی فرم تماس.
+         *
+         *    این دو مسیر سقف نرخ مشترک دارند، پس کاربری که تازه فرم
+         *    تماس را فرستاده ممکن است اینجا ۴۲۹ بگیرد. پیام عمومی
+         *    «خطایی رخ داد» او را دنبال ایراد ایمیلش می‌فرستد.
+         */
+        if (error.status === 429) {
+          setMessage({ kind: 'error', text: t('tooMany') })
+          return
+        }
+
+        /* خطای اعتبارسنجی متن دقیق سرور را دارد؛ همان بهتر است */
+        if (error.isValidation) {
+          setMessage({ kind: 'error', text: error.message })
+          return
+        }
+      }
+
+      setMessage({ kind: 'error', text: t('failed') })
+    },
+  })
+
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    if (!email.trim()) return
 
-    setStatus('loading')
+    const value = email.trim()
+    if (value === '' || mutation.isPending) return
 
-    /* شبیه‌سازی درخواست شبکه تا وضعیت بارگذاری قابل مشاهده باشد */
-    await new Promise((resolve) => setTimeout(resolve, 600))
-
-    setStatus('success')
-    setEmail('')
-
-    /* بازگشت به حالت اولیه پس از چند ثانیه */
-    setTimeout(() => setStatus('idle'), 4000)
+    setMessage(null)
+    mutation.mutate(value)
   }
 
   return (
-    <form onSubmit={handleSubmit} className={cn('flex flex-col gap-2', className)}>
+    <form onSubmit={handleSubmit} className={cn('flex flex-col gap-2', className)} noValidate>
       <div className="flex gap-2">
         <input
           type="email"
@@ -48,18 +89,20 @@ export function NewsletterForm({ className }: { className?: string }) {
           onChange={(e) => setEmail(e.target.value)}
           placeholder={t('placeholder')}
           aria-label={t('placeholder')}
-          disabled={status === 'loading'}
+          aria-invalid={message?.kind === 'error' ? 'true' : undefined}
+          disabled={mutation.isPending}
           className={cn(
             'h-11 flex-1 rounded-(--radius-md) border border-input bg-background px-3',
             'text-sm text-foreground placeholder:text-muted-foreground',
             'outline-none transition-colors focus:border-primary',
             'disabled:opacity-50',
+            message?.kind === 'error' && 'border-destructive',
           )}
         />
 
         <button
           type="submit"
-          disabled={status === 'loading'}
+          disabled={mutation.isPending}
           className={cn(
             'inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-(--radius-md)',
             'bg-primary px-5 text-sm font-medium text-primary-foreground',
@@ -67,22 +110,29 @@ export function NewsletterForm({ className }: { className?: string }) {
             'disabled:opacity-50',
           )}
         >
-          {status === 'loading' && (
+          {mutation.isPending && (
             <Loader2 className="size-4 animate-spin" aria-hidden="true" />
           )}
           {t('submit')}
         </button>
       </div>
 
-      {/* پیام موفقیت — با aria-live برای صفحه‌خوان */}
-      {status === 'success' && (
+      {/* نتیجه — موفقیت یا خطا، هر دو برای صفحه‌خوان اعلام می‌شوند */}
+      {message !== null && (
         <p
-          className="flex items-center gap-1.5 text-xs font-medium text-success"
+          className={cn(
+            'flex items-center gap-1.5 text-xs font-medium',
+            message.kind === 'success' ? 'text-success' : 'text-destructive',
+          )}
           role="status"
           aria-live="polite"
         >
-          <Check className="size-4" aria-hidden="true" />
-          {t('success')}
+          {message.kind === 'success' ? (
+            <Check className="size-4 shrink-0" aria-hidden="true" />
+          ) : (
+            <AlertCircle className="size-4 shrink-0" aria-hidden="true" />
+          )}
+          {message.text}
         </p>
       )}
     </form>

@@ -4,6 +4,7 @@ namespace App\Services\Auth;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
 use App\Notifications\WelcomeNotification;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Hash;
@@ -60,8 +61,19 @@ class AuthService
          */
         try {
             $user->notify(new WelcomeNotification(app()->getLocale()));
+
+            /*
+             * ⚠️ ایمیل تأیید همراه خوش‌آمد می‌رود، نه به‌جای آن.
+             *
+             *    تأیید ایمیل دروازه‌ی خرید نیست (این فروشگاه است
+             *    نه بانک)، ولی اگر همان اول فرستاده نشود کاربر
+             *    نشان «تأییدنشده» را در پروفایل می‌بیند بدون اینکه
+             *    بداند از کجا آمده. همیشه می‌تواند از پروفایل
+             *    دوباره درخواست بدهد.
+             */
+            $user->notify(new VerifyEmailNotification(app()->getLocale()));
         } catch (Throwable $e) {
-            Log::warning('ارسال ایمیل خوش‌آمد ناموفق بود', [
+            Log::warning('ارسال ایمیل‌های ثبت‌نام ناموفق بود', [
                 'user' => $user->id,
                 'error' => $e->getMessage(),
             ]);

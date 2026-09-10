@@ -1,11 +1,22 @@
 'use client'
 
 /**
- * صفحه‌بندی مشترک پنل مدیریت
+ * صفحه‌بندی مشترک — پنل مدیریت و صفحه‌های حساب کاربری
  * ---------------------------------------------------------------------------
  * چرا کامپوننت جدا و نه تکرار در هر فهرست؟
  *   فهرست سفارش‌ها و فهرست محصولات هر دو صفحه‌بندی یکسان دارند.
  *   با یک کامپوننت، رفتار کیبورد و دسترسی‌پذیری یک بار درست می‌شود.
+ *
+ * ⚠️ همه‌ی کلیدهای ترجمه از فضای `common` می‌آید، نه `admin`.
+ *
+ *    این کامپوننت در `components/account/` هم استفاده می‌شود و
+ *    آن‌ها مسیر فروشگاهی‌اند. بسته‌ی پیام صفحه‌های فروشگاه فضای
+ *    `admin` را ندارد (`withoutAdminMessages` در
+ *    `i18n/messages.ts` حذفش می‌کند)، پس هر کلیدی از آن فضا
+ *    صفحه را با MISSING_MESSAGE می‌شکند.
+ *
+ *    اگر متنی به این کامپوننت اضافه کردی، کلیدش باید در
+ *    `common` باشد.
  *
  * ⚠️ نکته‌ی دسترسی‌پذیری: کل ناوبری داخل <nav> با aria-label است و
  *    صفحه‌ی فعال aria-current="page" می‌گیرد؛ بدون آن، کاربر
@@ -25,8 +36,7 @@ interface Props {
 }
 
 export function AdminPagination({ meta, onPageChange }: Props) {
-  const t = useTranslations('admin')
-  const tCommon = useTranslations('common')
+  const t = useTranslations('common')
   const locale = useLocale() as Locale
 
   /* یک صفحه یعنی چیزی برای ناوبری نیست */
@@ -79,7 +89,7 @@ export function AdminPagination({ meta, onPageChange }: Props) {
             type="button"
             onClick={() => onPageChange(current - 1)}
             disabled={current <= 1}
-            aria-label={tCommon('previous')}
+            aria-label={t('previous')}
             className={cn(buttonBase, 'hover:bg-accent')}
           >
             <PrevIcon className="size-4" aria-hidden="true" />
@@ -120,7 +130,7 @@ export function AdminPagination({ meta, onPageChange }: Props) {
             type="button"
             onClick={() => onPageChange(current + 1)}
             disabled={current >= last}
-            aria-label={tCommon('next')}
+            aria-label={t('next')}
             className={cn(buttonBase, 'hover:bg-accent')}
           >
             <NextIcon className="size-4" aria-hidden="true" />

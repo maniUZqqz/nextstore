@@ -86,12 +86,138 @@ const call = (path, options = {}) =>
     },
   })
 
+/* ============ کوپن آزمایشی ============ */
+
+/** حداقل مبلغ سبد برای فعال‌شدن کوپن آزمایشی — به ریال. */
+const MIN_FOR_COUPON = 50_000_000
+
 /**
- * ساخت سبدی که به حداقل کوپن BIGSPENDER برسد.
+ * کد ثابت است، نه یکتا در هر اجرا.
  *
- * ⚠️ کوپن WELCOME10 سقف «هر کاربر یک بار» دارد و اجرای اول مصرفش
- *    می‌کند. BIGSPENDER سقف سه‌تایی دارد و برای تکرار مناسب‌تر است —
- *    ولی حداقل سبد پنج میلیون تومان می‌خواهد.
+ * ⚠️ کوپنی که در سفارشی مصرف شده **حذف نمی‌شود** — API عمداً ۴۲۲
+ *    می‌دهد، چون حذفش سفارش‌ها را یتیم می‌کند. بخش ۵ هر اجرا یک
+ *    سفارش واقعی با همین کوپن ثبت می‌کند، پس از اجرای دوم به بعد
+ *    پاک‌کردن و ساختن دوباره ناممکن است.
+ *
+ *    کد یکتا در هر اجرا این را دور می‌زد ولی هر اجرا یک ردیف
+ *    غیرقابل‌حذف در فهرست کوپن‌ها جا می‌گذاشت — همان زباله‌ای که
+ *    جای دیگر از آن پرهیز شده. پس یک کد ثابت می‌ماند و هر اجرا به
+ *    حالت شناخته‌شده **به‌روزرسانی** می‌شود.
+ */
+const COUPON_CODE = 'E2E-DISCOUNT'
+
+const adminToken = await apiLogin('admin@demo.dev')
+
+const adminCall = (path, options = {}) =>
+  fetch(API + path, {
+    ...options,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'Accept-Language': 'fa',
+      Authorization: 'Bearer ' + adminToken,
+      ...options.headers,
+    },
+  })
+
+/**
+ * مقادیر کوپن — همان مقادیر BIGSPENDER سیدر، تا آنچه سنجیده می‌شود
+ * عوض نشود: درصدی، سقف تخفیف، و حداقل سبد.
+ *
+ * `per_user_limit` بیشترین مقدار مجاز API است. چون هر اجرا یک
+ * سفارش می‌سازد، یعنی حدود صد اجرا سهمیه دارد؛ بعد از آن اجرا با
+ * پیام روشن متوقف می‌شود، نه با شکست گیج‌کننده.
+ */
+const COUPON_PAYLOAD = {
+  code: COUPON_CODE,
+  description: 'کوپن ثابت تست سرتاسری',
+  type: 'percent',
+  value: 20,
+  max_discount: 10_000_000,
+  min_order_total: MIN_FOR_COUPON,
+  usage_limit: null,
+  per_user_limit: 100,
+  starts_at: null,
+  expires_at: null,
+  is_active: true,
+}
+
+/** کوپن آزمایشی موجود، یا تهی. پارامتر جستجو `q` است نه `search`. */
+async function findTestCoupon() {
+  const list = await (await adminCall(`/admin/coupons?q=${COUPON_CODE}`)).json()
+
+  return (list.data ?? []).find((coupon) => coupon.code === COUPON_CODE) ?? null
+}
+
+/** ساخت کوپن، یا برگرداندنش به حالت شناخته‌شده اگر از قبل هست. */
+async function ensureTestCoupon() {
+  const existing = await findTestCoupon()
+
+  const response = existing
+    ? await adminCall(`/admin/coupons/${existing.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(COUPON_PAYLOAD),
+      })
+    : await adminCall('/admin/coupons', {
+        method: 'POST',
+        body: JSON.stringify(COUPON_PAYLOAD),
+      })
+
+  if (!response.ok) {
+    console.error()
+    console.error(`❌ آماده‌سازی کوپن آزمایشی ناموفق بود — کد ${response.status}`)
+    console.error(await response.text())
+    console.error()
+    process.exit(1)
+  }
+}
+
+/**
+ * سنجش اینکه کوپن هنوز برای این کاربر قابل استفاده است.
+ *
+ * ⚠️ اعمال کوپن روی سبد چیزی مصرف نمی‌کند — فقط ثبت سفارش مصرف
+ *    می‌کند. پس این بررسی بی‌هزینه است و ارزشش این است که وقتی
+ *    سهمیه‌ی صدتایی تمام شود، پیامِ روشن می‌دهد به‌جای اینکه بخش ۳
+ *    با «تخفیف اعمال نشد» بیفتد و شبیه باگ محاسبه به نظر برسد.
+ */
+async function assertCouponUsable() {
+  const response = await call('/cart/coupon', {
+    method: 'POST',
+    body: JSON.stringify({ code: COUPON_CODE }),
+  })
+
+  if (!response.ok) {
+    console.error()
+    console.error(`❌ کوپن آزمایشی برای این کاربر پذیرفته نشد — کد ${response.status}`)
+    console.error('   ' + (await response.text()).slice(0, 200))
+    console.error()
+    console.error('  اگر پیام از سهمیه می‌گوید، یعنی صد اجرای این سوئیت')
+    console.error('  سهمیه‌ی کوپن را تمام کرده. دیتابیس را تازه کن:')
+    console.error('      cd nextstore-api')
+    console.error('      ../tools/php/php.exe artisan migrate:fresh --seed')
+    console.error()
+    process.exit(1)
+  }
+
+  /* برداشته می‌شود تا بخش ۱ سبدِ بی‌تخفیف ببیند */
+  await call('/cart/coupon', { method: 'DELETE' })
+}
+
+/**
+ * ساخت سبدی که به حداقل کوپن آزمایشی برسد.
+ *
+ * ⚠️ کوپن **ساخته می‌شود**، از سیدر برداشته نمی‌شود.
+ *
+ *    نسخه‌ی قبلی از BIGSPENDER استفاده می‌کرد چون سقفش سه‌تایی بود و
+ *    «برای تکرار مناسب‌تر» به نظر می‌رسید. ولی بخش ۵ هر اجرا یک سفارش
+ *    واقعی ثبت می‌کند و هر سفارش یکی از آن سه را می‌سوزاند: اجرای
+ *    چهارم به بعد، کوپن برای همان کاربر رد می‌شد و بخش ۳ با «تخفیف
+ *    اعمال نشد» شکست می‌خورد — که شبیه باگ محاسبه‌ی تخفیف است، نه
+ *    شبیه تمام‌شدن سهمیه.
+ *
+ *    حالا هر اجرا کوپن خودش را می‌سازد و آخر کار پاک می‌کند، پس
+ *    شمارنده‌اش همیشه از صفر شروع می‌شود. کوپن‌های سیدشده دست‌نخورده
+ *    می‌مانند و بخش ۲ همچنان پیام‌های خطای واقعی‌شان را می‌سنجد.
  *
  * ⚠️ محصول باید **موجود** باشد و انتخابش نباید به یک ردیف خاص وابسته
  *    بماند: نسخه‌ی اول این تست همیشه گران‌ترین محصول را برمی‌داشت و
@@ -103,8 +229,7 @@ const call = (path, options = {}) =>
  *    حالا فقط بین محصولات موجود می‌گردد و اگر هیچ‌کدام کافی نبود،
  *    **صریحاً شکست می‌خورد** به‌جای اینکه بی‌صدا ادامه دهد.
  */
-const MIN_FOR_BIGSPENDER = 50_000_000  // ریال
-
+await ensureTestCoupon()
 await call('/cart', { method: 'DELETE' })
 
 const candidates = await (await fetch(
@@ -119,7 +244,7 @@ for (const product of candidates.data ?? []) {
   const price = product.finalPrice ?? product.price
   /* سقف تعداد در هر قلم سبد ۱۰ است و بیش از موجودی هم نمی‌شود */
   const maxQty = Math.min(product.stock ?? 0, 10)
-  const needed = Math.ceil((MIN_FOR_BIGSPENDER + 1) / price)
+  const needed = Math.ceil((MIN_FOR_COUPON + 1) / price)
 
   if (needed <= maxQty) {
     productId = product.id
@@ -142,12 +267,15 @@ await call('/cart/items', {
 
 const cartBefore = (await (await call('/cart')).json()).data
 
-if (cartBefore.summary.subtotal < MIN_FOR_BIGSPENDER) {
+if (cartBefore.summary.subtotal < MIN_FOR_COUPON) {
   console.error('\n❌ سبد آزمایشی به حداقل کوپن نرسید — تست بی‌معنا می‌شد.')
   process.exit(1)
 }
 
 console.log(`cart: product ${productId} × ${quantity} = ${cartBefore.summary.subtotal.toLocaleString()}`)
+
+/* حالا که سبد به حداقل رسیده، سهمیه‌ی کوپن سنجیده می‌شود */
+await assertCouponUsable()
 
 mkdirSync(OUT, { recursive: true })
 
@@ -221,14 +349,14 @@ console.log('--- 2. distinct error messages ---')
 /* ============ ۳. اعمال موفق ============ */
 console.log('--- 3. successful apply ---')
 {
-  await page.fill('input[placeholder="کد تخفیف"]', 'BIGSPENDER')
+  await page.fill('input[placeholder="کد تخفیف"]', COUPON_CODE)
   await page.getByRole('button', { name: 'اعمال' }).click()
   await page.waitForTimeout(2500)
 
   check('input replaced by applied state', (await page.locator('input[placeholder="کد تخفیف"]').count()) === 0)
 
   const body = await page.locator('main').innerText()
-  check('code shown', body.includes('BIGSPENDER'))
+  check('code shown', body.includes(COUPON_CODE))
 
   const summary = await summaryText()
   check('discount row appeared', summary.includes('تخفیف'))
@@ -260,7 +388,7 @@ console.log('--- 4. remove coupon ---')
 /* ============ ۵. تخفیف تا فاکتور سفارش می‌رسد ============ */
 console.log('--- 5. discount survives to the order ---')
 {
-  await call('/cart/coupon', { method: 'POST', body: JSON.stringify({ code: 'BIGSPENDER' }) })
+  await call('/cart/coupon', { method: 'POST', body: JSON.stringify({ code: COUPON_CODE }) })
   const cart = (await (await call('/cart')).json()).data
 
   const addresses = (await (await call('/addresses')).json()).data
@@ -313,6 +441,12 @@ console.log('--- 6. english + mobile ---')
 await call('/cart', { method: 'DELETE' })
 await call('/cart/coupon', { method: 'DELETE' })
 console.log('  cleanup: cart emptied')
+
+/*
+ * کوپن آزمایشی عمداً باقی می‌ماند: بخش ۵ با آن سفارش ثبت کرده و
+ * API حذف کوپنِ مصرف‌شده را رد می‌کند. اجرای بعدی همان ردیف را به
+ * حالت شناخته‌شده برمی‌گرداند، پس چیزی انباشته نمی‌شود.
+ */
 
 check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 2).join(' | '))
 

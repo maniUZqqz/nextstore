@@ -166,6 +166,12 @@ return [
     'contact_sent' => 'پیام شما ثبت شد. به‌زودی پاسخ می‌دهیم.',
     'contact_deleted' => 'پیام حذف شد.',
 
+    /* --- خبرنامه --- */
+    'newsletter_email_required' => 'ایمیل را وارد کنید.',
+    'newsletter_email_invalid' => 'ایمیل معتبر نیست.',
+    'newsletter_subscribed' => 'عضویت شما در خبرنامه ثبت شد.',
+    'newsletter_unsubscribed' => 'عضویت شما لغو شد. دیگر ایمیلی نمی‌فرستیم.',
+
     /* --- بنرها --- */
     'banner_title_required' => 'عنوان فارسی بنر الزامی است.',
     'banner_href_required' => 'مقصد بنر را وارد کنید.',

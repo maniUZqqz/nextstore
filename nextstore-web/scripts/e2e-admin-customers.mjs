@@ -22,6 +22,7 @@
 import { chromium } from 'playwright-core'
 import { existsSync, readdirSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { waitForCount, waitUntil } from './lib/wait.mjs'
 
 const BASE = process.env.SHOTS_BASE_URL ?? 'http://127.0.0.1:3100'
 const API = process.env.API_BASE_URL ?? 'http://127.0.0.1:8100/api/v1'
@@ -182,10 +183,18 @@ console.log('--- 1. list page ---')
 console.log('--- 2. buyers tab filters ---')
 {
   await page.locator('[role="tab"]').nth(1).click()
-  await page.waitForTimeout(2000)
 
-  const rows = await page.locator('table tbody tr').count()
-  check('buyers list is smaller than all', rows === Math.min(counts.buyers, 20),
+  /*
+   * ⚠️ انتظار تا خودِ جدول فیلتر شود، نه یک زمان ثابت.
+   *
+   *    نشان تب بی‌درنگ عدد درست را نشان می‌دهد (از کوئری شمارش‌ها
+   *    می‌آید) ولی ردیف‌های جدول تا پایان واکشی دوم همان ۲۰ ردیف
+   *    قبلی‌اند. با انتظار ثابت، بررسی گاهی مقدار کهنه را می‌خواند
+   *    و «فیلتر کار نمی‌کند» گزارش می‌دهد — که درست نیست.
+   */
+  const expected = Math.min(counts.buyers, 20)
+  const rows = await waitForCount(page, 'table tbody tr', expected)
+  check('buyers list is smaller than all', rows === expected,
     `rows=${rows} buyers=${counts.buyers}`)
 }
 
@@ -198,9 +207,11 @@ console.log('--- 3. sort by highest spend ---')
   const firstBefore = await page.locator('table tbody tr').first().innerText()
 
   await page.selectOption('select', 'spent')
-  await page.waitForTimeout(2000)
 
-  const firstAfter = await page.locator('table tbody tr').first().innerText()
+  const firstAfter = await waitUntil(
+    () => page.locator('table tbody tr').first().innerText(),
+    (text) => text !== firstBefore,
+  )
   check('sorting changes the first row', firstBefore !== firstAfter)
   check('top spender is first', firstAfter.includes(topBuyer.name),
     firstAfter.split('\n')[0])
@@ -211,9 +222,8 @@ console.log('--- 4. search by email ---')
 {
   await page.fill('input[type="search"]', topBuyer.email)
   await page.getByRole('button', { name: 'جستجو' }).first().click()
-  await page.waitForTimeout(2000)
 
-  const rows = await page.locator('table tbody tr').count()
+  const rows = await waitForCount(page, 'table tbody tr', 1)
   check('search narrows to one row', rows === 1, `rows=${rows}`)
 }
 

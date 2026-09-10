@@ -18,6 +18,7 @@ import type { Metadata } from 'next'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { Truck, ShieldCheck, RotateCcw, Package } from 'lucide-react'
 import { getProduct, getRelatedProducts } from '@/lib/api/catalog'
+import { getSiteSettings, freeShippingValues } from '@/lib/api/settings'
 import { ApiError } from '@/lib/api/client'
 import type { Locale } from '@/i18n/routing'
 import type { Product } from '@/types/product'
@@ -160,6 +161,18 @@ export default async function ProductPage({
     { Icon: RotateCcw, key: 'returns' },
   ] as const
 
+  /*
+   * ⚠️ متن «ارسال» پارامتر می‌گیرد، بقیه نه.
+   *
+   *    این صفحه همان کلید نوار خدمات صفحه‌ی اصلی را استفاده می‌کند
+   *    («سفارش بالای {amount} {currency}») ولی پارامترها را پاس
+   *    نمی‌داد. next-intl آن را بی‌صدا رد نمی‌کند: خطای
+   *    FORMATTING_ERROR در کنسول هر صفحه‌ی محصول می‌نشست و به‌جای
+   *    عدد، خودِ «{amount}» به کاربر نشان داده می‌شد.
+   */
+  const settings = await getSiteSettings(locale)
+  const freeShipping = freeShippingValues(settings, locale as Locale)
+
   return (
     <>
       {/* تزریق داده ساختاریافته در صفحه */}
@@ -290,7 +303,9 @@ export default async function ProductPage({
                     <Icon className="size-4 shrink-0 text-success" aria-hidden="true" />
                     <span className="text-muted-foreground">
                       {tHome(`features.${key}.title`)} —{' '}
-                      {tHome(`features.${key}.desc`)}
+                      {key === 'shipping'
+                        ? tHome('features.shipping.desc', freeShipping)
+                        : tHome(`features.${key}.desc`)}
                     </span>
                   </li>
                 ))}
