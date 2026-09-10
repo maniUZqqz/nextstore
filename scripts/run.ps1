@@ -889,6 +889,14 @@ NEXT_PUBLIC_API_URL=http://127.0.0.1:$ApiPort/api/v1
 
 # آدرس عمومی سایت — برای canonical و hreflang
 NEXT_PUBLIC_SITE_URL=http://localhost:$WebPort
+
+# راز باطل‌سازی کش — پنل مدیریت با همین، کش صفحه‌ها را تازه می‌کند.
+# عمداً بدون پیشوند NEXT_PUBLIC_ تا به مرورگر نرود.
+#
+# اگر این خط نباشد، ذخیره‌ی تغییرات در پنل بی‌صدا بی‌اثر می‌ماند:
+# داده در دیتابیس عوض می‌شود ولی فروشگاه تا انقضای کش همان
+# مقدار قدیمی را نشان می‌دهد و هیچ خطایی هم جایی دیده نمی‌شود.
+REVALIDATE_SECRET=dev-only-revalidate-secret-change-me
 "@ | Set-Content '.env.local' -Encoding utf8
         Write-Ok 'فایل .env.local ساخته شد'
     } else {

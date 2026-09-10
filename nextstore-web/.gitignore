@@ -33,6 +33,15 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# ⚠️ نمونه باید در مخزن بماند.
+#
+#    الگوی `.env*` قالب نکست، خودِ `.env.example` را هم می‌گیرد.
+#    نتیجه‌اش این بود که هر کسی مخزن را کلون می‌کرد هیچ فهرستی از
+#    متغیرهای لازم نداشت — و `REVALIDATE_SECRET` که پیشوند
+#    NEXT_PUBLIC_ ندارد، در هیچ کد کلاینتی هم دیده نمی‌شود تا
+#    بشود حدسش زد.
+!.env.example
+
 # vercel
 .vercel
 
